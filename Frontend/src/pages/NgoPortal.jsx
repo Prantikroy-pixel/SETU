@@ -8,7 +8,6 @@ import { RiskLegendControl, RiskSegmentedRoute } from '../components/RiskCorrido
 import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
-// import StockCategoryBadge from '../components/StockCategoryBadge'; // TODO: Fix on Linux
 import { AlertCircle, CheckCircle, Package, PlusCircle, MapPin, Eye, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 

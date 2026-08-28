@@ -11,7 +11,6 @@ import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
 import DistrictAdminNotificationFeed from '../components/DistrictAdminNotificationFeed';
-// import StockCategoryBadge from '../components/StockCategoryBadge'; // TODO: Fix on Linux
 import AiRiskAnalyzer from '../components/AiRiskAnalyzer';
 import {
   Activity,
