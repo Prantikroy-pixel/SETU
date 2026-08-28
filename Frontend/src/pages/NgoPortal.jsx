@@ -386,7 +386,6 @@ export default function NgoPortal() {
                       <tr key={r.id} className="hover:bg-slate-50">
                         <td className="px-4 py-3 text-slate-400 font-mono">#{r.id}</td>
                         <td className="px-4 py-3">
-                          {/* <StockCategoryBadge type={r.type} size="sm" showLabel={true} /> */}
                           <span className="text-xs text-slate-500">Stock Badge</span>
                         </td>
                         <td className="px-4 py-3 font-semibold text-slate-900">{r.quantity_available} {r.unit}</td>
