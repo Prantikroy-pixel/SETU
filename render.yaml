@@ -37,4 +37,3 @@ databases:
     databaseName: setu_db
     user: setu_user
     plan: free
-    postgresVersion: 16
