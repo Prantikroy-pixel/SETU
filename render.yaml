@@ -1,11 +1,5 @@
 services:
-  # React Frontend - Static Files Only
-  - type: static_site
-    name: setu-frontend
-    buildCommand: "cd Frontend && npm install && npm run build"
-    staticPublishPath: Frontend/dist
-
-  # Django Backend Service
+  # Django Backend Service with PostgreSQL
   - type: web
     name: setu-backend
     env: python
