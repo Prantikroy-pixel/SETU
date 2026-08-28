@@ -32,15 +32,26 @@ if not SECRET_KEY:
     else:
         raise ImproperlyConfigured("CRITICAL SECURITY VIOLATION: SECRET_KEY environment variable must be set in production.")
 
-# Trust HTTPS proxy headers from Vercel / Nginx load balancers
+# Trust HTTPS proxy headers from Vercel / Render / Nginx load balancers
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Detect hosting environment
+IS_RENDER = os.getenv('RENDER') == 'true' or 'RENDER' in os.environ
+IS_VERCEL = os.getenv('VERCEL') == '1' or 'VERCEL' in os.environ
 
 allowed_hosts_env = os.getenv('ALLOWED_HOSTS')
 if allowed_hosts_env:
     ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
+elif IS_RENDER or IS_VERCEL:
+    # Render and Vercel provide domain via environment
+    render_url = os.getenv('RENDER_EXTERNAL_URL', '')
+    if render_url:
+        ALLOWED_HOSTS = [render_url.replace('https://', '').replace('http://', '')]
+    else:
+        # Fallback for Render/Vercel
+        ALLOWED_HOSTS = ['.onrender.com', '.vercel.app']
 else:
-    # Permit all hosts on Vercel cloud deployment
-    ALLOWED_HOSTS = ['*']
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -106,12 +117,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-# Database configuration with transparent SQLite fallback
+# Database configuration - Render uses PostgreSQL, local uses SQLite
 DATABASE_URL = os.getenv('DATABASE_URL')
 USE_SQLITE = os.getenv('USE_SQLITE', 'False').lower() in ('true', '1')
 
-IS_VERCEL = os.getenv('VERCEL') == '1' or 'VERCEL' in os.environ
-if IS_VERCEL:
+# Determine SQLite path based on environment
+if IS_RENDER:
+    SQLITE_DB_PATH = Path('/tmp') / 'db.sqlite3'
+elif IS_VERCEL:
     SQLITE_DB_PATH = Path('/tmp') / 'db.sqlite3'
     # Copy pre-populated SQLite DB to /tmp to preserve migrations and seed data
     original_db = BASE_DIR / 'db.sqlite3'
@@ -124,29 +137,19 @@ if IS_VERCEL:
 else:
     SQLITE_DB_PATH = BASE_DIR / 'db.sqlite3'
 
-def _is_postgres_available(host, port, user, password, dbname):
-    if USE_SQLITE:
-        return False
-    try:
-        import psycopg2
-        conn = psycopg2.connect(
-            host=host, port=port, user=user, password=password, dbname=dbname, connect_timeout=1
-        )
-        conn.close()
-        return True
-    except Exception:
-        return False
-
-if DATABASE_URL and not USE_SQLITE:
+# Render provides DATABASE_URL, so use PostgreSQL in production
+if DATABASE_URL and not USE_SQLITE and (IS_RENDER or IS_VERCEL or 'postgres' in DATABASE_URL.lower()):
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
             default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
+            engine='django.db.backends.postgresql',
         )
     }
 else:
+    # Fallback to SQLite for local development
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -222,6 +225,7 @@ _DEFAULT_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5174',
     'https://setulive.vercel.app',
     'https://setu-frontend-five.vercel.app',
+    'https://setu-frontend.onrender.com',
 ]
 
 cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS')
@@ -234,8 +238,10 @@ else:
     CORS_ALLOWED_ORIGINS = _DEFAULT_ALLOWED_ORIGINS
 
 # Permit all Vercel production & preview deployment subdomains securely via regex
+# Also permit all Render deployment subdomains
 CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https://.*\.vercel\.app$",
+    r"^https://.*\.onrender\.com$",
     r"^http://localhost:[0-9]+$",
     r"^http://127\.0\.0\.1:[0-9]+$",
 ]

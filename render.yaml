@@ -1,24 +1,54 @@
 services:
+  # PostgreSQL Database Service
+  - type: web
+    name: setu-frontend
+    env: static
+    buildCommand: "cd Frontend && npm install && npm run build"
+    staticPublishPath: Frontend/dist
+    routes:
+      - type: rewrite
+        source: "/api/*"
+        destination: "https://setu-backend-${RENDER_GIT_COMMIT:0:7}.onrender.com/api/*"
+      - type: rewrite
+        source: "/(.*)"
+        destination: "/index.html"
+
+  # Django Backend Service
   - type: web
     name: setu-backend
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    buildCommand: "cd backend && pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
+    startCommand: "cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --worker-class sync --timeout 60"
     rootDir: backend
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: RENDER
+        value: "true"
+      - key: DEBUG
+        value: "false"
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: ".onrender.com,localhost,127.0.0.1"
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://setu-frontend.onrender.com"
       - key: DATABASE_URL
         fromDatabase:
           name: setu-db
           property: connectionString
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_PASSWORD
+        generateValue: true
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@setu.local
 
 databases:
   - name: setu-db
     databaseName: setu_db
     user: setu_user
     plan: free
+    postgresVersion: 16
