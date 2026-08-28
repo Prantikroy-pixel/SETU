@@ -10,8 +10,13 @@ from .predict import (
     interpolate_route_waypoints,
     detect_route_anomalies,
 )
-from .train import train_and_save_model
 from .realtime_pipeline import RealtimeHazardFetcher
+
+# Lazy import train_and_save_model to avoid loading sklearn on Django startup
+def train_and_save_model(*args, **kwargs):
+    """Lazy wrapper for training - only imports sklearn when actually called"""
+    from .train import train_and_save_model as _train
+    return _train(*args, **kwargs)
 
 __all__ = [
     'predict_risk',
