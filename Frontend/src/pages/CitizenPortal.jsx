@@ -170,9 +170,7 @@ export default function CitizenPortal() {
         </div>
       </div>
 
-      {/* Real-time Highway Traffic Disruption Broadcast Banner */}
-      {/* TODO: Fix CitizenTrafficAlertBanner import
-      <CitizenTrafficAlertBanner /> */}
+      {/* Real-time Highway Traffic Disruption Broadcast Banner - TODO: Fix import */}
 
       {/* Real-time Live Telemetry Banner */}
       <RealtimeTelemetryBanner
