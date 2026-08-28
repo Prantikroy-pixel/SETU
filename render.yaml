@@ -1,4 +1,17 @@
 services:
+  # React Frontend Service
+  - type: web
+    name: setu-frontend
+    env: node
+    buildCommand: "cd Frontend && npm install && npm run build"
+    startCommand: "cd Frontend && npm run preview"
+    rootDir: Frontend
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        value: "https://setu-backend.onrender.com/api"
+
   # Django Backend Service with PostgreSQL
   - type: web
     name: setu-backend
