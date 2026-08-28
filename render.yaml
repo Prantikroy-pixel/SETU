@@ -3,9 +3,9 @@ services:
   - type: web
     name: setu-frontend
     env: node
-    buildCommand: "cd Frontend && npm install && npm run build"
-    startCommand: "cd Frontend && npm run preview"
-    rootDir: Frontend
+    buildCommand: "cd frontend && npm install && npm run build"
+    startCommand: "cd frontend && npm run preview"
+    rootDir: frontend
     envVars:
       - key: NODE_ENV
         value: production
