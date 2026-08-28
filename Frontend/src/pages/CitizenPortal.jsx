@@ -8,8 +8,6 @@ import MapLocationInspector from '../components/MapLocationInspector';
 import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
-// TODO: Fix CitizenTrafficAlertBanner import on Linux
-// import CitizenTrafficAlertBanner from '../components/CitizenTrafficAlertBanner';
 import { AlertCircle, PlusCircle, CheckCircle, MapPin, Radio, Eye } from 'lucide-react';
 import L from 'leaflet';
 
