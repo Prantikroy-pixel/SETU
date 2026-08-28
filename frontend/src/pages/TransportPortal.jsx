@@ -7,10 +7,18 @@ import RealtimeTelemetryBanner from '../components/RealtimeTelemetryBanner';
 import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
-import {
-  SILCHAR_HAFLONG_HIGHWAY_ROUTE,
-  SILCHAR_HAFLONG_GEOJSON,
-} from '../data/index.js';
+
+// Import route data with fallback
+let SILCHAR_HAFLONG_HIGHWAY_ROUTE = [];
+let SILCHAR_HAFLONG_GEOJSON = null;
+
+try {
+  const routeData = require('../data/silcharHaflongRoute.js');
+  SILCHAR_HAFLONG_HIGHWAY_ROUTE = routeData.SILCHAR_HAFLONG_HIGHWAY_ROUTE || [];
+  SILCHAR_HAFLONG_GEOJSON = routeData.SILCHAR_HAFLONG_GEOJSON || null;
+} catch (e) {
+  console.warn('Route data not available:', e);
+}
 import {
   AlertCircle,
   CheckCircle,
