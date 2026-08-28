@@ -8,7 +8,8 @@ import MapLocationInspector from '../components/MapLocationInspector';
 import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
-import CitizenTrafficAlertBanner from '../components/CitizenTrafficAlertBanner';
+// TODO: Fix CitizenTrafficAlertBanner import on Linux
+// import CitizenTrafficAlertBanner from '../components/CitizenTrafficAlertBanner';
 import { AlertCircle, PlusCircle, CheckCircle, MapPin, Radio, Eye } from 'lucide-react';
 import L from 'leaflet';
 
@@ -170,7 +171,8 @@ export default function CitizenPortal() {
       </div>
 
       {/* Real-time Highway Traffic Disruption Broadcast Banner */}
-      <CitizenTrafficAlertBanner />
+      {/* TODO: Fix CitizenTrafficAlertBanner import
+      <CitizenTrafficAlertBanner /> */}
 
       {/* Real-time Live Telemetry Banner */}
       <RealtimeTelemetryBanner
