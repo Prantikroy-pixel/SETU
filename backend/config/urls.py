@@ -6,8 +6,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
+
+# Health check endpoint
+def health_check(request):
+    return JsonResponse({"status": "ok", "message": "SETU backend is running"})
 
 urlpatterns = [
+    # Health check
+    path('health/', health_check),
+    path('api/health/', health_check),
+
     path('admin/', admin.site.urls),
 
     # Authentication & User Profiles
