@@ -10,7 +10,7 @@ import CustomSelect from '../components/CustomSelect';
 import {
   SILCHAR_HAFLONG_HIGHWAY_ROUTE,
   SILCHAR_HAFLONG_GEOJSON,
-} from '../data/silcharHaflongRoute';
+} from '../data/index.js';
 import {
   AlertCircle,
   CheckCircle,
