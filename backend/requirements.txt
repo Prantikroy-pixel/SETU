@@ -11,3 +11,4 @@ gunicorn>=22.0.0
 asgiref>=3.8.0
 sqlparse>=0.5.0
 whitenoise>=6.0.0
+dj-database-url>=2.1.0

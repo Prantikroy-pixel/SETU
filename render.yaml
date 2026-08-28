@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: setu-backend
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    rootDir: backend
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com,localhost,127.0.0.1"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: setu-db
+          property: connectionString
+
+databases:
+  - name: setu-db
+    databaseName: setu_db
+    user: setu_user
+    plan: free

@@ -138,72 +138,14 @@ def _is_postgres_available(host, port, user, password, dbname):
         return False
 
 if DATABASE_URL and not USE_SQLITE:
-    import urllib.parse
-    parsed_url = urllib.parse.urlparse(DATABASE_URL)
-    pg_host = parsed_url.hostname or 'localhost'
-    pg_port = parsed_url.port or 5432
-    pg_user = parsed_url.username or 'postgres'
-    pg_pass = parsed_url.password or ''
-    pg_name = parsed_url.path.lstrip('/')
-
-    if _is_postgres_available(pg_host, pg_port, pg_user, pg_pass, pg_name):
-        engine = 'django.db.backends.postgresql'
-        if 'postgis' in parsed_url.scheme:
-            try:
-                from django.contrib.gis.db.backends.postgis import base
-                engine = 'django.contrib.gis.db.backends.postgis'
-            except Exception:
-                engine = 'django.db.backends.postgresql'
-
-        DATABASES = {
-            'default': {
-                'ENGINE': engine,
-                'NAME': pg_name,
-                'USER': pg_user,
-                'PASSWORD': pg_pass,
-                'HOST': pg_host,
-                'PORT': pg_port,
-            }
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': SQLITE_DB_PATH,
-            }
-        }
-elif os.getenv('DB_NAME') and not USE_SQLITE:
-    pg_host = os.getenv('DB_HOST', 'localhost')
-    pg_port = os.getenv('DB_PORT', '5432')
-    pg_user = os.getenv('DB_USER', 'postgres')
-    pg_pass = os.getenv('DB_PASSWORD', '')
-    pg_name = os.getenv('DB_NAME')
-
-    if _is_postgres_available(pg_host, pg_port, pg_user, pg_pass, pg_name):
-        db_engine = 'django.db.backends.postgresql'
-        try:
-            from django.contrib.gis.db.backends.postgis import base
-            db_engine = 'django.contrib.gis.db.backends.postgis'
-        except Exception:
-            db_engine = 'django.db.backends.postgresql'
-
-        DATABASES = {
-            'default': {
-                'ENGINE': os.getenv('DB_ENGINE', db_engine),
-                'NAME': pg_name,
-                'USER': pg_user,
-                'PASSWORD': pg_pass,
-                'HOST': pg_host,
-                'PORT': pg_port,
-            }
-        }
-    else:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': SQLITE_DB_PATH,
-            }
-        }
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
 else:
     DATABASES = {
         'default': {
