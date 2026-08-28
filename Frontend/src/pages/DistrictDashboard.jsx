@@ -11,7 +11,7 @@ import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
 import DistrictAdminNotificationFeed from '../components/DistrictAdminNotificationFeed';
-import StockCategoryBadge from '../components/StockCategoryBadge';
+// import StockCategoryBadge from '../components/StockCategoryBadge'; // TODO: Fix on Linux
 import AiRiskAnalyzer from '../components/AiRiskAnalyzer';
 import {
   Activity,
@@ -1652,7 +1652,7 @@ export default function DistrictDashboard() {
                       <tr key={r.id} className="hover:bg-slate-50/70 transition-colors">
                         <td className="p-3.5 font-bold text-slate-900">
                           <div className="flex items-center gap-2.5">
-                            <StockCategoryBadge type={r.type} size="sm" showLabel={false} />
+                            {/* <StockCategoryBadge type={r.type} size="sm" showLabel={false} /> */}
                             <span className="font-bold text-slate-900 text-xs">
                               {r.name || r.item_type || `${r.type ? r.type.replace('_', ' ') : 'Resource'} Stock #${r.id}`}
                             </span>
