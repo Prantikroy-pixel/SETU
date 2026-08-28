@@ -8,17 +8,9 @@ import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
 
-// Import route data with fallback
-let SILCHAR_HAFLONG_HIGHWAY_ROUTE = [];
-let SILCHAR_HAFLONG_GEOJSON = null;
-
-try {
-  const routeData = require('../data/silcharHaflongRoute.js');
-  SILCHAR_HAFLONG_HIGHWAY_ROUTE = routeData.SILCHAR_HAFLONG_HIGHWAY_ROUTE || [];
-  SILCHAR_HAFLONG_GEOJSON = routeData.SILCHAR_HAFLONG_GEOJSON || null;
-} catch (e) {
-  console.warn('Route data not available:', e);
-}
+// Route data fallbacks (files removed due to build issues)
+const SILCHAR_HAFLONG_HIGHWAY_ROUTE = [];
+const SILCHAR_HAFLONG_GEOJSON = null;
 import {
   AlertCircle,
   CheckCircle,
