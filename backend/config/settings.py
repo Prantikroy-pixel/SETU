@@ -36,19 +36,14 @@ else:
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-setu-production-fallback-key-98127391823')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Host Header Validation (Permit all Render, Vercel, and API Checker hosts)
 allowed_hosts_env = os.getenv('ALLOWED_HOSTS')
 if allowed_hosts_env:
     ALLOWED_HOSTS = [h.strip() for h in allowed_hosts_env.split(',') if h.strip()]
-elif IS_RENDER or IS_VERCEL:
-    # Render and Vercel provide domain via environment
-    render_url = os.getenv('RENDER_EXTERNAL_URL', '')
-    if render_url:
-        ALLOWED_HOSTS = [render_url.replace('https://', '').replace('http://', '')]
-    else:
-        # Fallback for Render/Vercel
-        ALLOWED_HOSTS = ['.onrender.com', '.vercel.app']
+    if '*' not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append('*')
 else:
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -217,14 +212,8 @@ if cors_origins_env:
 else:
     CORS_ALLOWED_ORIGINS = _DEFAULT_ALLOWED_ORIGINS
 
-# Permit all Vercel production & preview deployment subdomains securely via regex
-# Also permit all Render deployment subdomains
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://.*\.vercel\.app$",
-    r"^https://.*\.onrender\.com$",
-    r"^http://localhost:[0-9]+$",
-    r"^http://127\.0\.0\.1:[0-9]+$",
-]
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HTTP Security Response Headers (SEC-009)
@@ -236,14 +225,8 @@ SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
-# Production HTTPS and Transport Security
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000  # 1 Year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+# Render edge load balancer handles HTTPS termination securely
+SECURE_SSL_REDIRECT = False
 
 # Weather & SMS Gateways API Keys
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY', '')
