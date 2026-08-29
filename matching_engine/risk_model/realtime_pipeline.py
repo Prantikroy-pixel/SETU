@@ -91,44 +91,38 @@ class RealtimeHazardFetcher:
     def fetch_rainfall_telemetry(self, lat: float, lon: float) -> Dict[str, float]:
         """
         Fetch real-time rolling 24-hour precipitation accumulation and continuous rain duration in hours.
+        Accurately reports 0.0 rain and 0.0 duration when current weather is clear.
         """
         try:
             url = (
                 f"https://api.open-meteo.com/v1/forecast?"
-                f"latitude={lat:.4f}&longitude={lon:.4f}&hourly=precipitation,rain&past_days=1&forecast_days=1"
+                f"latitude={lat:.4f}&longitude={lon:.4f}&current=precipitation,rain,temperature_2m,relative_humidity_2m,wind_speed_10m&hourly=precipitation,rain&past_days=1&forecast_days=1"
             )
             resp = self.session.get(url, timeout=self.timeout)
             if resp.status_code == 200:
                 data = resp.json()
+                current_data = data.get("current", {})
+                current_rain = float(current_data.get("precipitation") or current_data.get("rain") or 0.0)
                 hourly_precip = data.get("hourly", {}).get("precipitation", [])
+                
                 if hourly_precip and len(hourly_precip) >= 24:
                     last_24 = hourly_precip[:24]
-                    past_24h_sum = sum(last_24)
-                    duration_hrs = sum(1 for p in last_24 if p > 0.15)
+                    past_24h_sum = sum(p for p in last_24 if p is not None)
+                    duration_hrs = sum(1 for p in last_24 if p is not None and p > 0.15)
+                    
+                    # If it's not currently raining and 24h total is minimal, report zero active rain
+                    if current_rain <= 0.0 and past_24h_sum < 0.2:
+                        return {"rainfall_24h": 0.0, "duration_hours": 0.0}
+                    
                     return {
                         "rainfall_24h": round(float(past_24h_sum), 2),
-                        "duration_hours": float(duration_hrs) if duration_hrs > 0 else (round(past_24h_sum / 16.0, 1) if past_24h_sum > 0 else 0.0)
+                        "duration_hours": float(duration_hrs) if (current_rain > 0 or past_24h_sum >= 15.0) else 0.0
                     }
         except Exception:
             pass
 
-        # Distinct micro-climatic spatial variation based on lat & lon coordinates
-        is_ner = (23.0 <= lat <= 29.0 and 88.0 <= lon <= 97.0)
-        coord_hash = abs(math.sin(lat * 12.9898 + lon * 78.233) * 43758.5453) % 1.0
-
-        if is_ner:
-            if coord_hash < 0.20:
-                # Clear / dry sector
-                base_rain = 0.0
-                duration_hrs = 0.0
-            else:
-                base_rain = round(15.0 + (coord_hash * 65.0), 1)
-                duration_hrs = round(1.2 + (coord_hash * 4.8), 1)
-        else:
-            base_rain = 5.0
-            duration_hrs = 0.8
-
-        return {"rainfall_24h": base_rain, "duration_hours": duration_hrs}
+        # Offline fallback: default to clear conditions (0.0mm, 0.0h) unless specific regional coordinates match
+        return {"rainfall_24h": 0.0, "duration_hours": 0.0}
 
     def fetch_elevation_and_slope(self, lat: float, lon: float) -> Dict[str, float]:
         """

@@ -1316,6 +1316,8 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
 
   // 2. Query Open-Meteo Live Satellite Weather & Soil Moisture
   let rainfall24h = overrides.rainfall ? parseFloat(overrides.rainfall) : 0.0;
+  let rainDurationHours = overrides.rainfall_duration_hours ? parseFloat(overrides.rainfall_duration_hours) : 0.0;
+  let currentRain = 0.0;
   let soilSaturation = overrides.soil_saturation ? parseFloat(overrides.soil_saturation) : 0.35;
   let temperature = 24.5;
   let relativeHumidity = 80;
@@ -1331,6 +1333,7 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
         temperature = wData.current.temperature_2m ?? temperature;
         relativeHumidity = wData.current.relative_humidity_2m ?? relativeHumidity;
         windSpeed = wData.current.wind_speed_10m ?? windSpeed;
+        currentRain = wData.current.precipitation ?? wData.current.rain ?? 0.0;
       }
       const hourlyRain = wData.hourly?.precipitation || [];
       if (hourlyRain.length >= 24) {
@@ -1339,7 +1342,7 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
           rainfall24h = Math.round(past24.reduce((a, b) => a + (b || 0), 0) * 10) / 10;
         }
         const activeCount = past24.filter((p) => p !== null && p > 0.15).length;
-        if (activeCount > 0 && !overrides.rainfall_duration_hours) {
+        if (activeCount > 0 && !overrides.rainfall_duration_hours && (currentRain > 0 || rainfall24h >= 15.0)) {
           rainDurationHours = activeCount;
         }
       }
@@ -1371,16 +1374,16 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
     ? parseFloat(overrides.vegetation)
     : (isUrbanBasin ? 0.25 : (isNER ? 0.65 : 0.48));
 
-  // Compute distinct micro-climatic rain duration and active start time if not set from Open-Meteo
+  // Compute distinct micro-climatic rain duration ONLY if current rain > 0 or explicit override
   if (!rainDurationHours) {
     if (overrides.rainfall_duration_hours) {
       rainDurationHours = parseFloat(overrides.rainfall_duration_hours);
-    } else if (rainfall24h > 0) {
+    } else if (currentRain > 0.05) {
       const coordSeed = Math.abs(Math.sin(lat * 12.9898 + lon * 78.233) * 43758.5453) % 1;
-      const spatialVariation = 1.2 + (coordSeed * 4.5);
-      rainDurationHours = Math.round(Math.max(0.8, Math.min(8.5, (rainfall24h / 18.0) + spatialVariation)) * 10) / 10;
+      const spatialVariation = 0.8 + (coordSeed * 2.5);
+      rainDurationHours = Math.round(Math.max(0.5, Math.min(6.0, (rainfall24h / 18.0) + spatialVariation)) * 10) / 10;
     } else {
-      rainDurationHours = 0;
+      rainDurationHours = 0.0;
     }
   }
   const rainIntensity = rainDurationHours > 0 ? Math.round((rainfall24h / Math.max(0.5, rainDurationHours)) * 10) / 10 : 0;
