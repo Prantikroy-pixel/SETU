@@ -1342,8 +1342,10 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
           rainfall24h = Math.round(past24.reduce((a, b) => a + (b || 0), 0) * 10) / 10;
         }
         const activeCount = past24.filter((p) => p !== null && p > 0.15).length;
-        if (activeCount > 0 && !overrides.rainfall_duration_hours && (currentRain > 0 || rainfall24h >= 15.0)) {
+        if (activeCount > 0 && !overrides.rainfall_duration_hours && currentRain > 0.05) {
           rainDurationHours = activeCount;
+        } else if (currentRain <= 0.05) {
+          rainDurationHours = 0.0;
         }
       }
       const hourlyMoisture = wData.hourly?.soil_moisture_0_to_1cm || [];
