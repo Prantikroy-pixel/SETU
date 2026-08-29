@@ -116,7 +116,8 @@ class RealtimeHazardFetcher:
                     
                     return {
                         "rainfall_24h": round(float(past_24h_sum), 2),
-                        "duration_hours": float(duration_hrs) if (current_rain > 0 or past_24h_sum >= 15.0) else 0.0
+                        "current_rain": round(float(current_rain), 2),
+                        "duration_hours": float(duration_hrs) if current_rain > 0.05 else 0.0
                     }
         except Exception:
             pass

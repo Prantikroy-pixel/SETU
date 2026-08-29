@@ -138,11 +138,11 @@ def fetch_realtime_features_for_coord(lat: float, lon: float) -> Tuple[Dict[str,
     is_ner = (23.0 <= lat <= 29.0 and 88.0 <= lon <= 97.0)
     slope = 22.0 if is_ner and (lat > 27.0 or (lat < 26.0 and lon > 92.0)) else 4.5
     elevation = 650.0 if slope > 15.0 else 90.0
-    rain = 15.0
-    rain_dur = 1.0
+    rain = 0.0
+    rain_dur = 0.0
     drainage = 2.1 if slope <= 5.0 else 1.5
     veg = 0.62 if is_ner else 0.45
-    soil_sat = 0.35
+    soil_sat = 0.20
 
     features = {
         "rainfall": rain,
@@ -192,7 +192,7 @@ def predict_risk(
             if rainfall is None:
                 rainfall = fetched_features["rainfall"]
             if rainfall_duration_hours is None:
-                rainfall_duration_hours = fetched_features.get("rainfall_duration_hours", 1.0)
+                rainfall_duration_hours = fetched_features.get("rainfall_duration_hours", 0.0)
             if slope is None:
                 slope = fetched_features["slope"]
             if elevation is None:
@@ -206,7 +206,9 @@ def predict_risk(
         else:
             # Static regional fallback
             if rainfall is None:
-                rainfall = 15.0
+                rainfall = 0.0
+            if rainfall_duration_hours is None:
+                rainfall_duration_hours = 0.0
             if slope is None:
                 slope = 28.0 if (23.0 <= lat <= 29.0 and 89.0 <= lon <= 97.0) else 6.0
             if elevation is None:
@@ -225,7 +227,7 @@ def predict_risk(
     else:
         rainfall_duration_hours = float(rainfall_duration_hours)
 
-    rainfall_intensity_mm_hr = round(rainfall / max(0.5, rainfall_duration_hours), 1) if rainfall > 0 else 0.0
+    rainfall_intensity_mm_hr = round(rainfall / max(0.5, rainfall_duration_hours), 1) if (rainfall > 0 and rainfall_duration_hours > 0) else 0.0
 
     slope = float(slope)
     elevation = float(elevation)
