@@ -201,6 +201,7 @@ _DEFAULT_ALLOWED_ORIGINS = [
     'https://setulive.vercel.app',
     'https://setu-frontend-five.vercel.app',
     'https://setu-frontend.onrender.com',
+    'https://setu-9.onrender.com',
 ]
 
 cors_origins_env = os.getenv('CORS_ALLOWED_ORIGINS')
