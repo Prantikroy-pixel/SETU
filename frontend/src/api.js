@@ -1386,15 +1386,17 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
       rainDurationHours = 0.0;
     }
   }
-  const rainIntensity = rainDurationHours > 0 ? Math.round((rainfall24h / Math.max(0.5, rainDurationHours)) * 10) / 10 : 0;
+  // Active rain duration is 0.0 unless there is active ongoing precipitation (currentRain > 0.05)
+  const activeRainDuration = currentRain > 0.05 ? rainDurationHours : 0.0;
+  const rainIntensity = activeRainDuration > 0 ? Math.round((currentRain / Math.max(0.5, activeRainDuration)) * 10) / 10 : 0;
 
   // 4. ML Logistic Hazard Inference & Urban Flash Flood Rules
-  const urbanFlashFloodCondition = (drainage <= 1.5 && vegetation <= 0.40 && (rainfall24h >= 50 || rainDurationHours >= 3));
+  const urbanFlashFloodCondition = (drainage <= 1.5 && vegetation <= 0.40 && (currentRain >= 5.0 || (rainfall24h >= 60.0 && activeRainDuration >= 3.0)));
 
   const z =
-    0.028 * rainfall24h +
+    0.028 * (currentRain > 0.05 ? rainfall24h : 0.0) +
     0.052 * slope +
-    2.1 * soilSaturation -
+    2.1 * (currentRain > 0.05 ? soilSaturation : 0.20) -
     0.35 * drainage -
     1.4 * vegetation +
     0.00025 * elevation -
@@ -1403,9 +1405,9 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
 
   if (urbanFlashFloodCondition) {
     riskScore = Math.max(riskScore, 0.85);
-  } else if ((slope >= 18 && rainfall24h >= 40) || (slope >= 28 && rainfall24h >= 25)) {
+  } else if (currentRain > 0.05 && ((slope >= 18 && rainfall24h >= 40) || (slope >= 28 && rainfall24h >= 25))) {
     riskScore = Math.max(riskScore, 0.82);
-  } else if (slope <= 3.5 && rainfall24h >= 65) {
+  } else if (currentRain > 0.05 && slope <= 3.5 && rainfall24h >= 65) {
     riskScore = Math.max(riskScore, 0.74);
   }
   riskScore = Math.round(Math.min(0.99, Math.max(0.02, riskScore)) * 100) / 100;
@@ -1415,12 +1417,12 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
   const threatLevel = isCritical ? 'critical' : isHigh ? 'high' : riskScore >= 0.25 ? 'moderate' : 'low';
 
   const explanationText = urbanFlashFloodCondition
-    ? `URBAN FLASH FLOOD RISK (Guwahati / Silchar / Built Basin): Sustained heavy rainfall over ${rainDurationHours} continuous hours (${rainfall24h}mm total, ${rainIntensity}mm/h intensity). Poor storm drainage (${drainage} km/km²) and sparse vegetation (${vegetation} NDVI) cause severe street waterlogging and road submergence.`
+    ? `URBAN FLASH FLOOD RISK (Guwahati / Silchar / Built Basin): Sustained heavy rainfall over ${activeRainDuration} continuous hours (${rainfall24h}mm total, ${rainIntensity}mm/h intensity). Poor storm drainage (${drainage} km/km²) and sparse vegetation (${vegetation} NDVI) cause severe street waterlogging and road submergence.`
     : isCritical
-    ? `🚨 High disruption probability (${Math.round(riskScore * 100)}%) detected from live satellite telemetry: ${slope}° slope at ${elevation}m elevation with ${rainfall24h}mm precipitation over ${rainDurationHours}h.`
+    ? `🚨 High disruption probability (${Math.round(riskScore * 100)}%) detected from live satellite telemetry: ${slope}° slope at ${elevation}m elevation with ${rainfall24h}mm precipitation over ${activeRainDuration}h.`
     : isHigh
     ? `⚠️ Moderate-to-high environmental risk (${Math.round(riskScore * 100)}%): sustained rain (${rainfall24h}mm) on steep incline (${slope}°).`
-    : `✅ Corridor clear (${Math.round(riskScore * 100)}% risk). Live satellite telemetry confirms nominal pass conditions (${rainfall24h}mm rainfall, ${slope}° slope, ${elevation}m elev).`;
+    : `✅ Corridor clear (${Math.round(riskScore * 100)}% risk). Live satellite telemetry confirms nominal pass conditions (${currentRain > 0.05 ? rainfall24h + 'mm active rain' : 'clear weather'}, ${slope}° slope, ${elevation}m elev).`;
 
   return mockResponse({
     latitude: lat,
@@ -1434,11 +1436,12 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
       temperature_c: temperature,
       relative_humidity_pct: relativeHumidity,
       wind_speed_kmh: windSpeed,
-      condition: weatherCondition,
+      condition: currentRain > 0.05 ? 'Active Satellite Rain Ingestion' : 'Clear / Sunny Weather',
     },
     features: {
       rainfall_mm: rainfall24h,
-      rainfall_duration_hours: rainDurationHours,
+      current_rain_mm_hr: currentRain,
+      rainfall_duration_hours: activeRainDuration,
       rainfall_intensity_mm_hr: rainIntensity,
       slope_degrees: slope,
       elevation_m: elevation,
