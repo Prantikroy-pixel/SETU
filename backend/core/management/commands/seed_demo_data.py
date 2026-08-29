@@ -47,16 +47,6 @@ class Command(BaseCommand):
                     "centroid": Point(d["lon"], d["lat"]),
                 }
             )
-            if not dist_obj.boundary:
-                try:
-                    b_data = boundary_fetcher.fetch_district_geojson_boundary(d["name"], d["state"])
-                    if b_data and "geometry" in b_data:
-                        dist_obj.boundary = b_data["geometry"]
-                        dist_obj.save(update_fields=['boundary'])
-                        self.stdout.write(self.style.SUCCESS(f"  [+] Attached live boundary for {dist_obj.name}"))
-                except Exception:
-                    pass
-
             district_map[d["name"]] = dist_obj
             self.stdout.write(f"District: {dist_obj.name} ({dist_obj.state})")
 
@@ -81,11 +71,11 @@ class Command(BaseCommand):
                     "phone_number": "+919876543210"
                 }
             )
-            if created:
-                user.set_password("Password123!")
-                if u["role"] in ["district_admin", "admin"]:
-                    user.is_staff = True
-                user.save()
+            user.set_password("Password123!")
+            if u["role"] in ["district_admin", "admin"]:
+                user.is_staff = True
+                user.is_superuser = True
+            user.save()
             user_map[u["username"]] = user
 
         # 3. Create Vehicles
