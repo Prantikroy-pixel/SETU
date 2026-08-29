@@ -1,24 +1,11 @@
+# render.yaml - Complete Infrastructure as Code for SETU
 services:
-  # React Frontend Service
-  - type: web
-    name: setu-frontend
-    env: node
-    buildCommand: "cd frontend && npm install && npm run build"
-    startCommand: "cd frontend && npm run preview"
-    rootDir: frontend
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: VITE_API_URL
-        value: "https://setu-backend.onrender.com/api"
-
-  # Django Backend Service with PostgreSQL
   - type: web
     name: setu-backend
     env: python
-    buildCommand: "cd backend && pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py migrate"
-    startCommand: "cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --worker-class sync --timeout 60"
     rootDir: backend
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --no-input"
+    startCommand: "python manage.py migrate --no-input && python manage.py seed_demo_data && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 4 --timeout 60"
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -29,21 +16,27 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: ".onrender.com"
+        value: ".onrender.com,setu-8.onrender.com"
       - key: CSRF_TRUSTED_ORIGINS
-        value: "https://*.onrender.com"
+        value: "https://*.onrender.com,https://setu-8.onrender.com"
       - key: CORS_ALLOWED_ORIGINS
-        value: "https://setu-frontend.onrender.com"
+        value: "https://setu-8.onrender.com"
       - key: DATABASE_URL
         fromDatabase:
           name: setu-db
           property: connectionString
-      - key: DJANGO_SUPERUSER_USERNAME
-        value: admin
-      - key: DJANGO_SUPERUSER_PASSWORD
-        generateValue: true
-      - key: DJANGO_SUPERUSER_EMAIL
-        value: admin@setu.local
+
+  - type: web
+    name: setu-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    startCommand: "npx serve -s dist -l $PORT"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: VITE_API_URL
+        value: "https://setu-8.onrender.com"
 
 databases:
   - name: setu-db

@@ -1,21 +1,16 @@
 import axios from 'axios';
 import { emitRealtimeEvent } from './utils/notificationSystem';
 
-// Sanitize VITE_API_URL: strip any trailing /api or /api/ so endpoints like /api/auth/login/ don't duplicate to /api/api/auth/login/
+// frontend/src/api.js - Robust Base URL Sanitization
 const getSanitizedBaseUrl = () => {
   let raw = (import.meta.env.VITE_API_URL || '').trim();
-  if (raw.endsWith('/api/')) {
-    raw = raw.slice(0, -5);
-  } else if (raw.endsWith('/api')) {
-    raw = raw.slice(0, -4);
-  }
-  if (raw.endsWith('/')) {
-    raw = raw.slice(0, -1);
-  }
-  return raw;
+  // Strip trailing slashes and redundant /api suffix so endpoints with /api/ prefix don't duplicate
+  while (raw.endsWith('/')) { raw = raw.slice(0, -1); }
+  if (raw.endsWith('/api')) { raw = raw.slice(0, -4); }
+  return raw; // Returns "https://setu-8.onrender.com" or "" (for relative proxy)
 };
 
-const API_BASE_URL = getSanitizedBaseUrl();
+export const API_BASE_URL = getSanitizedBaseUrl();
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

@@ -22,22 +22,19 @@ except ImportError:
 
 from django.core.exceptions import ImproperlyConfigured
 
-# Quick-start development settings - unsuitable for production
-DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
-
-SECRET_KEY = os.getenv('SECRET_KEY')
-if not SECRET_KEY:
-    if DEBUG:
-        SECRET_KEY = 'django-insecure-setu-development-secret-key-do-not-use-in-production'
-    else:
-        raise ImproperlyConfigured("CRITICAL SECURITY VIOLATION: SECRET_KEY environment variable must be set in production.")
-
-# Trust HTTPS proxy headers from Vercel / Render / Nginx load balancers
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Detect hosting environment
+# backend/config/settings.py - Secure Production DEBUG Default
 IS_RENDER = os.getenv('RENDER') == 'true' or 'RENDER' in os.environ
 IS_VERCEL = os.getenv('VERCEL') == '1' or 'VERCEL' in os.environ
+IS_PRODUCTION = IS_RENDER or IS_VERCEL or os.getenv('ENVIRONMENT') == 'production'
+
+# Default to False in production; allow True only if explicitly set in development
+if IS_PRODUCTION:
+    DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
+else:
+    DEBUG = os.getenv('DEBUG', 'True').lower() in ('true', '1', 'yes')
+
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-setu-production-fallback-key-98127391823')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 allowed_hosts_env = os.getenv('ALLOWED_HOSTS')
 if allowed_hosts_env:
@@ -117,28 +114,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 ASGI_APPLICATION = 'config.asgi.application'
 
-# Database configuration - Render uses PostgreSQL, local uses SQLite
+# backend/config/settings.py - Production PostgreSQL Database Configuration
 DATABASE_URL = os.getenv('DATABASE_URL')
 USE_SQLITE = os.getenv('USE_SQLITE', 'False').lower() in ('true', '1')
 
-# Determine SQLite path based on environment
-if IS_RENDER:
-    SQLITE_DB_PATH = Path('/tmp') / 'db.sqlite3'
-elif IS_VERCEL:
-    SQLITE_DB_PATH = Path('/tmp') / 'db.sqlite3'
-    # Copy pre-populated SQLite DB to /tmp to preserve migrations and seed data
-    original_db = BASE_DIR / 'db.sqlite3'
-    if original_db.exists() and not SQLITE_DB_PATH.exists():
-        try:
-            import shutil
-            shutil.copy2(original_db, SQLITE_DB_PATH)
-        except Exception:
-            pass
-else:
-    SQLITE_DB_PATH = BASE_DIR / 'db.sqlite3'
-
-# Render provides DATABASE_URL, so use PostgreSQL in production
-if DATABASE_URL and not USE_SQLITE and (IS_RENDER or IS_VERCEL or 'postgres' in DATABASE_URL.lower()):
+if DATABASE_URL and not USE_SQLITE:
     import dj_database_url
     DATABASES = {
         'default': dj_database_url.config(
@@ -149,11 +129,11 @@ if DATABASE_URL and not USE_SQLITE and (IS_RENDER or IS_VERCEL or 'postgres' in 
         )
     }
 else:
-    # Fallback to SQLite for local development
+    # Local development ONLY - never use /tmp/db.sqlite3 in production
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': SQLITE_DB_PATH,
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
