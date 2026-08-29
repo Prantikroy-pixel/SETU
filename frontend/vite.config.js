@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
+    allowedHosts: true,
     proxy: {
       // Forward all /api/* requests to Django backend — eliminates CORS in dev
       '/api': {
@@ -21,5 +22,10 @@ export default defineConfig({
         secure: false,
       },
     },
+  },
+  preview: {
+    port: 3000,
+    host: true,
+    allowedHosts: true,
   },
 })
