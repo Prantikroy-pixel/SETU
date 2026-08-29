@@ -369,18 +369,33 @@ export default function MapLocationInspector({
                         </span>
                       </div>
 
-                      {/* 3 Core Factors Breakdown */}
+                      {/* 4 Core Factors Breakdown */}
                       <div className="space-y-1.5 text-[11px] font-sans">
-                        {/* 1. Topographic Slope */}
+                        {/* 1. Live Precipitation Rate */}
                         <div className="flex items-center justify-between">
                           <span className="text-slate-400 flex items-center gap-1">
-                            <Mountain className="w-3 h-3 text-sky-400" />
+                            <CloudRain className="w-3 h-3 text-sky-400" />
+                            Live Precipitation Rate:
+                          </span>
+                          <span className="font-semibold text-slate-200">
+                            {typeof features.current_rain_mm_hr === 'number'
+                              ? `${features.current_rain_mm_hr} mm/h`
+                              : features.rainfall_mm !== undefined
+                              ? `${features.rainfall_mm} mm`
+                              : '0.0 mm/h'}
+                          </span>
+                        </div>
+
+                        {/* 2. Topographic Slope */}
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-400 flex items-center gap-1">
+                            <Mountain className="w-3 h-3 text-amber-400" />
                             Slope Gradient:
                           </span>
                           <span className="font-semibold text-slate-200">{(features.slope_degrees || 0.5).toFixed(1)}°</span>
                         </div>
 
-                        {/* 2. Drainage Capacity */}
+                        {/* 3. Drainage Capacity */}
                         <div className="flex items-center justify-between">
                           <span className="text-slate-400 flex items-center gap-1">
                             <Compass className="w-3 h-3 text-teal-400" />
@@ -391,7 +406,7 @@ export default function MapLocationInspector({
                           </span>
                         </div>
 
-                        {/* 3. Vegetation Root Matrix */}
+                        {/* 4. Vegetation Root Matrix */}
                         <div className="flex items-center justify-between">
                           <span className="text-slate-400 flex items-center gap-1">
                             <Trees className="w-3 h-3 text-emerald-400" />
@@ -427,10 +442,21 @@ export default function MapLocationInspector({
 
                 {/* 6-Tile Environmental Metrics Grid */}
                 <div className="grid grid-cols-2 gap-1.5">
+                  {/* Live Rain Rate */}
+                  <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
+                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
+                      <CloudRain className="w-3 h-3 text-blue-600" />
+                      <span>Live Rain Rate</span>
+                    </div>
+                    <div className="text-xs font-black text-slate-900 mt-0.5">
+                      {features.current_rain_mm_hr !== undefined ? `${features.current_rain_mm_hr} mm/h` : (features.rainfall_mm !== undefined ? `${features.rainfall_mm} mm` : '0.0 mm/h')}
+                    </div>
+                  </div>
+
                   {/* Topographic Slope */}
                   <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
                     <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
-                      <Mountain className="w-3 h-3 text-blue-600" />
+                      <Mountain className="w-3 h-3 text-amber-600" />
                       <span>Slope Gradient</span>
                     </div>
                     <div className="text-xs font-black text-slate-900 mt-0.5">
@@ -460,7 +486,6 @@ export default function MapLocationInspector({
                     </div>
                   </div>
 
-
                   {/* Drainage Quality */}
                   <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
                     <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
@@ -480,33 +505,11 @@ export default function MapLocationInspector({
                   {/* Vegetation Cover */}
                   <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
                     <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
-                      <Layers className="w-3 h-3 text-green-600" />
+                      <Trees className="w-3 h-3 text-green-600" />
                       <span>Vegetation Cover</span>
                     </div>
                     <div className="text-xs font-black text-slate-900 mt-0.5">
                       {features.vegetation_cover !== undefined ? `${Math.round(features.vegetation_cover * 100)}% NDVI` : '58%'}
-                    </div>
-                  </div>
-
-                  {/* Slope Gradient */}
-                  <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
-                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
-                      <Mountain className="w-3 h-3 text-amber-600" />
-                      <span>Slope Gradient</span>
-                    </div>
-                    <div className="text-xs font-black text-slate-900 mt-0.5">
-                      {features.slope_degrees !== undefined ? `${features.slope_degrees}°` : '--'}
-                    </div>
-                  </div>
-
-                  {/* Elevation */}
-                  <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
-                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
-                      <MapPin className="w-3 h-3 text-slate-600" />
-                      <span>Elevation</span>
-                    </div>
-                    <div className="text-xs font-black text-slate-900 mt-0.5">
-                      {features.elevation_m !== undefined ? `${Math.round(features.elevation_m)} m` : '--'}
                     </div>
                   </div>
                 </div>
