@@ -441,14 +441,14 @@ export default function MapLocationInspector({
                     </div>
                   </div>
 
-                  {/* 24h Rainfall */}
+                  {/* Soil Saturation */}
                   <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
                     <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
-                      <CloudRain className="w-3 h-3 text-blue-600" />
-                      <span>24h Rainfall</span>
+                      <Activity className="w-3 h-3 text-emerald-600" />
+                      <span>Soil Saturation</span>
                     </div>
                     <div className="text-xs font-black text-slate-900 mt-0.5">
-                      {features.rainfall_mm !== undefined ? `${features.rainfall_mm} mm` : '--'}
+                      {features.soil_saturation !== undefined ? `${Math.round(features.soil_saturation * 100)}%` : '35%'}
                     </div>
                   </div>
 

@@ -89,12 +89,8 @@ export default function RealtimeTelemetryBanner({
       <div className="flex items-center gap-2.5">
         <div className="hidden sm:flex items-center gap-2">
           <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-slate-700 text-[11px] font-semibold">
-            <CloudRain className="w-3.5 h-3.5 text-blue-500" />
-            <span className="font-mono">{liveWeather.rainfallMm} mm/24h</span>
-          </div>
-          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200/80 px-2.5 py-1 rounded-lg text-slate-700 text-[11px] font-semibold">
             <Wind className="w-3.5 h-3.5 text-teal-600" />
-            <span className="font-mono">{liveWeather.windKmh} km/h</span>
+            <span className="font-mono">{liveWeather.windKmh} km/h Wind</span>
           </div>
         </div>
 

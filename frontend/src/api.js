@@ -1559,13 +1559,38 @@ export const matchAPI = {
   },
 };
 
+const getPersistedVehicles = () => {
+  try {
+    const data = localStorage.getItem('setu_custom_vehicles');
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
+const savePersistedVehicle = (item) => {
+  try {
+    const current = getPersistedVehicles();
+    const updated = [item, ...current.filter((v) => v.id !== item.id)];
+    localStorage.setItem('setu_custom_vehicles', JSON.stringify(updated));
+  } catch (err) {
+    console.error('Failed to persist vehicle to local storage', err);
+  }
+};
+
 export const vehicleAPI = {
   list: async (filters = {}) => {
+    const localVehicles = getPersistedVehicles();
     try {
       const res = await apiClient.get('/api/vehicles/', { params: filters });
-      return res.data;
+      const apiResults = res.data?.results || (Array.isArray(res.data) ? res.data : []);
+      const existingIds = new Set(apiResults.map((v) => v.id));
+      const combined = [...localVehicles.filter((v) => !existingIds.has(v.id)), ...apiResults];
+      return Array.isArray(res.data) ? combined : { ...res.data, results: combined };
     } catch {
-      let filtered = MOCK_VEHICLES;
+      const existingIds = new Set(MOCK_VEHICLES.map((v) => v.id));
+      const combined = [...localVehicles.filter((v) => !existingIds.has(v.id)), ...MOCK_VEHICLES];
+      let filtered = combined;
       if (filters.status) filtered = filtered.filter(v => v.status === filters.status);
       return mockResponse(filtered);
     }
@@ -1579,11 +1604,14 @@ export const vehicleAPI = {
       newItem = {
         ...data,
         id: Date.now(),
-        current_location: { type: "Point", coordinates: [data.longitude || 92.78, data.latitude || 24.83], latitude: data.latitude || 24.83, longitude: data.longitude || 92.78 },
+        current_location: { type: "Point", coordinates: [parseFloat(data.longitude || 92.78), parseFloat(data.latitude || 24.83)], latitude: parseFloat(data.latitude || 24.83), longitude: parseFloat(data.longitude || 92.78) },
         status: "idle",
         last_ping_at: new Date().toISOString()
       };
       MOCK_VEHICLES.unshift(newItem);
+    }
+    if (newItem) {
+      savePersistedVehicle(newItem);
     }
     emitRealtimeEvent('TRANSPORT_ENROLLED', {
       title: 'New Heavy Transport Vehicle Enrolled',
@@ -1595,15 +1623,19 @@ export const vehicleAPI = {
   ping: async (id, payload) => {
     try {
       const res = await apiClient.post(`/api/vehicles/${id}/ping/`, payload);
-      return res.data;
+      const updated = res.data;
+      if (updated) savePersistedVehicle(updated);
+      return updated;
     } catch {
-      const matched = MOCK_VEHICLES.find(v => v.id === id) || MOCK_VEHICLES[0];
+      const local = getPersistedVehicles();
+      const matched = local.find(v => v.id === id) || MOCK_VEHICLES.find(v => v.id === id) || MOCK_VEHICLES[0];
       const updated = {
         ...matched,
         current_location: { type: "Point", coordinates: [payload.longitude, payload.latitude], latitude: payload.latitude, longitude: payload.longitude },
         status: payload.status || matched.status,
         last_ping_at: new Date().toISOString()
       };
+      savePersistedVehicle(updated);
       MOCK_VEHICLES.forEach((v, i) => {
         if (v.id === id) MOCK_VEHICLES[i] = updated;
       });

@@ -529,15 +529,13 @@ export default function AiRiskAnalyzer({
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
                 <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
                   <div className="text-slate-400 font-bold uppercase text-[10px] flex items-center gap-1">
-                    <CloudRain className="w-3.5 h-3.5 text-sky-500" />
-                    <span>24h Rainfall</span>
+                    <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                    <span>Soil Saturation</span>
                   </div>
                   <div className="text-sm font-black text-slate-900 mt-1">
-                    {predictionResult.features?.rainfall_mm ??
-                      predictionResult.range_metrics?.max_rainfall_mm ??
-                      predictionResult.realtime_factors?.rainfall_24h_mm ??
-                      predictionResult.input_features?.rainfall ??
-                      '0.0'} mm
+                    {predictionResult.features?.soil_saturation !== undefined
+                      ? `${Math.round(predictionResult.features.soil_saturation * 100)}%`
+                      : '35%'}
                   </div>
                 </div>
 

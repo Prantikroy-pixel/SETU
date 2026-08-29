@@ -10,7 +10,7 @@ from django.utils import timezone
 from .models import Vehicle
 from .serializers import VehicleSerializer, VehiclePingSerializer
 from core.spatial_compat import HAS_GIS
-from accounts.permissions import IsAssignedOperatorOrAdmin
+from accounts.permissions import IsTransportOperatorOrAdminOrReadOnly
 
 if HAS_GIS:
     from django.contrib.gis.geos import Point
@@ -27,7 +27,14 @@ class VehicleViewSet(viewsets.ModelViewSet):
     """
     queryset = Vehicle.objects.all().select_related('operator')
     serializer_class = VehicleSerializer
-    permission_classes = [IsAssignedOperatorOrAdmin]
+    permission_classes = [IsTransportOperatorOrAdminOrReadOnly]
+
+    def perform_create(self, serializer):
+        if self.request.user and self.request.user.is_authenticated:
+            serializer.save(operator=self.request.user)
+        else:
+            default_op = User.objects.filter(role='transport_operator').first()
+            serializer.save(operator=default_op)
 
     def get_queryset(self):
         qs = super().get_queryset()
