@@ -500,15 +500,24 @@ export default function AiRiskAnalyzer({
                   <span className="font-mono text-slate-600 text-[10px] flex items-center gap-3">
                     <span className="flex items-center gap-1">
                       <Thermometer className="w-3 h-3 text-amber-500" />
-                      {predictionResult.weather.temperature_c}°C
+                      {(() => {
+                        const value = Number(predictionResult.weather.temperature_c);
+                        return Number.isFinite(value) ? value.toFixed(1) : '—';
+                      })()}°C
                     </span>
                     <span className="flex items-center gap-1">
                       <Droplets className="w-3 h-3 text-sky-500" />
-                      {predictionResult.weather.relative_humidity_pct}% RH
+                      {(() => {
+                        const value = Number(predictionResult.weather.relative_humidity_pct);
+                        return Number.isFinite(value) ? Math.round(value) : '—';
+                      })()}% RH
                     </span>
                     <span className="flex items-center gap-1">
                       <Wind className="w-3 h-3 text-slate-400" />
-                      {predictionResult.weather.wind_speed_kmh} km/h
+                      {(() => {
+                        const value = Number(predictionResult.weather.wind_speed_kmh);
+                        return Number.isFinite(value) ? value.toFixed(1) : '—';
+                      })()}km/h
                     </span>
                   </span>
                 )}
@@ -538,9 +547,12 @@ export default function AiRiskAnalyzer({
                     <span>Soil Saturation</span>
                   </div>
                   <div className="text-sm font-black text-slate-900 mt-1">
-                    {predictionResult.features?.soil_saturation !== undefined
-                      ? `${Math.round(predictionResult.features.soil_saturation * 100)}%`
-                      : '35%'}
+                    {(() => {
+                      const rawValue = predictionResult.features?.soil_saturation;
+                      const value = Number(rawValue);
+                      const display = Number.isFinite(value) ? `${Math.round(Math.max(0, Math.min(100, value * 100)))}%` : '—';
+                      return display;
+                    })()}
                   </div>
                 </div>
 
@@ -552,11 +564,15 @@ export default function AiRiskAnalyzer({
                     <span>Slope Gradient</span>
                   </div>
                   <div className="text-sm font-black text-slate-900 mt-1">
-                    {predictionResult.features?.slope_degrees ??
-                      predictionResult.range_metrics?.max_slope_degrees ??
-                      predictionResult.realtime_factors?.slope_deg ??
-                      predictionResult.input_features?.slope ??
-                      '0.0'}°
+                    {(() => {
+                      const rawValue = predictionResult.features?.slope_degrees ??
+                                      predictionResult.range_metrics?.max_slope_degrees ??
+                                      predictionResult.realtime_factors?.slope_deg ??
+                                      predictionResult.input_features?.slope;
+                      const value = Number(rawValue);
+                      const display = Number.isFinite(value) ? value.toFixed(1) : '—';
+                      return `${display}°`;
+                    })()}
                   </div>
                 </div>
 
@@ -566,7 +582,12 @@ export default function AiRiskAnalyzer({
                     <span>Drainage Quality</span>
                   </div>
                   <div className="text-sm font-black text-slate-900 mt-1">
-                    {predictionResult.features?.drainage_quality ?? '2.1'} km/km²
+                    {(() => {
+                      const rawValue = predictionResult.features?.drainage_quality;
+                      const value = Number(rawValue);
+                      const display = Number.isFinite(value) ? value.toFixed(2) : '—';
+                      return `${display} km/km²`;
+                    })()}
                   </div>
                 </div>
 
