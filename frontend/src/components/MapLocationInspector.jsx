@@ -363,13 +363,13 @@ export default function MapLocationInspector({
 
                       {/* 3 Core Factors Breakdown */}
                       <div className="space-y-1.5 text-[11px] font-sans">
-                        {/* 1. Rainfall Start Time & Duration */}
+                        {/* 1. Topographic Slope */}
                         <div className="flex items-center justify-between">
                           <span className="text-slate-400 flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-sky-400" />
-                            Active Rain:
+                            <Mountain className="w-3 h-3 text-sky-400" />
+                            Slope Gradient:
                           </span>
-                          <span className="font-semibold text-slate-200">{formatRainActiveTime(rainDur, rainMm)}</span>
+                          <span className="font-semibold text-slate-200">{(features.slope_degrees || 0.5).toFixed(1)}°</span>
                         </div>
 
                         {/* 2. Drainage Capacity */}
@@ -405,11 +405,11 @@ export default function MapLocationInspector({
                       >
                         {isFloodPredicted ? (
                           <span>
-                            <strong>Flash Flood Risk:</strong> Sustained rain over {rainDur.toFixed(1)}h with low drainage ({drainageVal.toFixed(2)}) and sparse vegetation ({Math.round(vegVal * 100)}%). Road submergence predicted in <strong>{address?.placeName || 'this sector'}</strong> within 1–3 hours.
+                            <strong>Flash Flood Risk:</strong> Low drainage ({drainageVal.toFixed(2)}) and sparse vegetation ({Math.round(vegVal * 100)}%). Road submergence predicted in <strong>{address?.placeName || 'this sector'}</strong> within 1–3 hours.
                           </span>
                         ) : (
                           <span>
-                            <strong>Nominal Conditions:</strong> Terrain drainage ({drainageVal.toFixed(2)}) and topsoil root binding ({Math.round(vegVal * 100)}%) are sufficient to handle current precipitation.
+                            <strong>Nominal Conditions:</strong> Terrain drainage ({drainageVal.toFixed(2)}) and topsoil root binding ({Math.round(vegVal * 100)}%) are sufficient for safe transport.
                           </span>
                         )}
                       </div>
@@ -419,6 +419,28 @@ export default function MapLocationInspector({
 
                 {/* 6-Tile Environmental Metrics Grid */}
                 <div className="grid grid-cols-2 gap-1.5">
+                  {/* Topographic Slope */}
+                  <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
+                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
+                      <Mountain className="w-3 h-3 text-blue-600" />
+                      <span>Slope Gradient</span>
+                    </div>
+                    <div className="text-xs font-black text-slate-900 mt-0.5">
+                      {features.slope_degrees !== undefined ? `${features.slope_degrees}°` : '0.5°'}
+                    </div>
+                  </div>
+
+                  {/* Terrain Elevation */}
+                  <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
+                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
+                      <Compass className="w-3 h-3 text-indigo-600" />
+                      <span>Elevation</span>
+                    </div>
+                    <div className="text-xs font-black text-slate-900 mt-0.5">
+                      {features.elevation_m !== undefined ? `${Math.round(features.elevation_m)} m` : '23 m'}
+                    </div>
+                  </div>
+
                   {/* 24h Rainfall */}
                   <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
                     <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
@@ -430,21 +452,6 @@ export default function MapLocationInspector({
                     </div>
                   </div>
 
-                  {/* Rain Duration */}
-                  <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
-                    <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
-                      <Droplets className="w-3 h-3 text-indigo-600" />
-                      <span>Rain Duration</span>
-                    </div>
-                    <div className="text-xs font-black text-slate-900 mt-0.5">
-                      {features.rainfall_duration_hours !== undefined ? `${features.rainfall_duration_hours} hrs` : '1.0 hrs'}
-                      {features.rainfall_intensity_mm_hr ? (
-                        <span className="text-[9px] font-semibold text-slate-500 block">
-                          ({features.rainfall_intensity_mm_hr} mm/h)
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
 
                   {/* Drainage Quality */}
                   <div className="bg-slate-50 p-2 rounded-md border border-slate-200/70">
