@@ -212,8 +212,20 @@ if cors_origins_env:
 else:
     CORS_ALLOWED_ORIGINS = _DEFAULT_ALLOWED_ORIGINS
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
+
+# Permit all Vercel production & preview deployment subdomains securely via regex
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
+    r"^https://.*\.onrender\.com$",
+    r"^http://localhost:[0-9]+$",
+    r"^http://127\.0\.0\.1:[0-9]+$",
+]
+
+# CSRF Trusted Origins
+csrf_origins_env = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://setu-frontend-cdgn.onrender.com')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_env.split(',') if origin.strip()]
 
 # ─────────────────────────────────────────────────────────────────────────────
 # HTTP Security Response Headers (SEC-009)

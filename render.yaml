@@ -29,14 +29,14 @@ services:
   - type: web
     name: setu-frontend
     env: node
-    rootDir: frontend
+    rootDir: Frontend
     buildCommand: "npm install && npm run build"
     startCommand: "npx serve -s dist -l $PORT"
     envVars:
       - key: NODE_ENV
         value: production
       - key: VITE_API_URL
-        value: "https://setu-8.onrender.com"
+        value: "https://setu-8.onrender.com/api"
 
 databases:
   - name: setu-db
