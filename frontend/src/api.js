@@ -1315,8 +1315,8 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
   }
 
   // 2. Query Open-Meteo Live Satellite Weather & Soil Moisture
-  let rainfall24h = overrides.rainfall ? parseFloat(overrides.rainfall) : 0.0;
-  let rainDurationHours = overrides.rainfall_duration_hours ? parseFloat(overrides.rainfall_duration_hours) : 0.0;
+  let rainfall24h = overrides.rainfall ? parseFloat(overrides.rainfall) || 0.0 : 0.0;
+  let rainDurationHours = overrides.rainfall_duration_hours ? (parseFloat(overrides.rainfall_duration_hours) || 0.0) : 0.0;
   let currentRain = 0.0;
   let soilSaturation = overrides.soil_saturation ? parseFloat(overrides.soil_saturation) : 0.35;
   let temperature = 24.5;
@@ -1377,9 +1377,10 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
     : (isUrbanBasin ? 0.25 : (isNER ? 0.65 : 0.48));
 
   // Compute distinct micro-climatic rain duration ONLY if current rain > 0 or explicit override
-  if (!rainDurationHours) {
+  if (!rainDurationHours || rainDurationHours === undefined || isNaN(rainDurationHours)) {
     if (overrides.rainfall_duration_hours) {
-      rainDurationHours = parseFloat(overrides.rainfall_duration_hours);
+      const parsed = parseFloat(overrides.rainfall_duration_hours);
+      rainDurationHours = !isNaN(parsed) ? parsed : 0.0;
     } else if (currentRain > 0.05) {
       const coordSeed = Math.abs(Math.sin(lat * 12.9898 + lon * 78.233) * 43758.5453) % 1;
       const spatialVariation = 0.8 + (coordSeed * 2.5);
