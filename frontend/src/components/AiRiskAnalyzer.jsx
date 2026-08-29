@@ -156,7 +156,12 @@ export default function AiRiskAnalyzer({
       }
     } catch (err) {
       clearInterval(stepInterval);
-      setErrorMsg('AI inference pipeline failed. Verify network connectivity or coordinates.');
+      console.warn('AI API inference failed, running stored telemetry fallback:', err);
+      const lat = parseFloat(pointForm.latitude || 24.8333);
+      const lon = parseFloat(pointForm.longitude || 92.7789);
+      const fallbackResult = await fetchLiveGeospatialPoint(lat, lon, pointForm);
+      setPredictionResult(fallbackResult);
+      setErrorMsg(null);
     } finally {
       setLoading(false);
       setProgressStep('');

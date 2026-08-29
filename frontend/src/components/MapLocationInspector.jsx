@@ -164,12 +164,16 @@ export default function MapLocationInspector({
           };
         })();
 
-        // B. Query AI Hazard & Disruption Engine
-        const hazardPromise = conditionAPI.predictRisk({
-          lat,
-          lon,
-          use_realtime: true,
-        });
+        // B. Query AI Hazard & Disruption Engine (with safe stored data point fallback)
+        const hazardPromise = (async () => {
+          try {
+            const res = await conditionAPI.predictRisk({ lat, lon, use_realtime: true });
+            if (res && res.risk_score !== undefined) return res;
+          } catch (e) {
+            console.warn('predictRisk API failed, generating stored telemetry fallback:', e);
+          }
+          return await fetchLiveGeospatialPoint(lat, lon, {});
+        })();
 
         const [addrResult, rawHazardResult] = await Promise.all([geocodePromise, hazardPromise]);
 
@@ -216,6 +220,7 @@ export default function MapLocationInspector({
           }
         }
 
+        setError(null);
         setAddress(addrResult);
         setHazardData(finalHazard);
 
@@ -229,8 +234,26 @@ export default function MapLocationInspector({
           });
         }
       } catch (err) {
-        console.error('Failed to fetch location hazard details', err);
-        setError('Could not evaluate real-time climate data for this point.');
+        console.warn('API error fetching live hazard, using stored telemetry fallback:', err);
+        const hub = getNearestHub(lat, lon);
+        const fallbackAddress = {
+          placeName: hub.approxKm <= 5 ? hub.name : `${hub.approxKm} km from ${hub.name}`,
+          districtName: hub.district,
+          stateName: hub.state,
+          fullAddress: `${hub.name} Sector, ${hub.district}, ${hub.state}`,
+        };
+        const fallbackHazard = await fetchLiveGeospatialPoint(lat, lon, {});
+        setAddress(fallbackAddress);
+        setHazardData(fallbackHazard);
+        setError(null);
+        if (onLocationSelected) {
+          onLocationSelected({
+            lat,
+            lon,
+            address: fallbackAddress,
+            hazard: fallbackHazard,
+          });
+        }
       } finally {
         setLoading(false);
       }
