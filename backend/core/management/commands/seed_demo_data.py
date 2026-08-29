@@ -52,8 +52,9 @@ class Command(BaseCommand):
 
         # 2. Create Users with different roles
         users_data = [
-            {"username": "officer_ananda", "email": "ananda@setu.org", "role": "field_officer", "district": district_map["Cachar"], "verified": True},
+            {"username": "admin_setu", "email": "admin@setu.org", "role": "admin", "district": district_map["Kamrup Metropolitan"], "verified": True},
             {"username": "admin_aryan", "email": "aryan@setu.org", "role": "district_admin", "district": district_map["Kamrup Metropolitan"], "verified": True},
+            {"username": "officer_ananda", "email": "ananda@setu.org", "role": "field_officer", "district": district_map["Cachar"], "verified": True},
             {"username": "operator_rajesh", "email": "rajesh.transport@setu.org", "role": "transport_operator", "district": district_map["Cachar"], "verified": True},
             {"username": "redcross_assam", "email": "relief@redcross.org", "role": "ngo", "district": district_map["Kamrup Metropolitan"], "verified": True},
             {"username": "citizen_priya", "email": "priya@gmail.com", "role": "citizen", "district": district_map["East Khasi Hills"], "verified": False},
@@ -71,6 +72,11 @@ class Command(BaseCommand):
                     "phone_number": "+919876543210"
                 }
             )
+            user.email = u["email"]
+            user.role = u["role"]
+            user.district = u["district"]
+            user.is_verified = u["verified"]
+            user.is_active = True
             user.set_password("Password123!")
             if u["role"] in ["district_admin", "admin"]:
                 user.is_staff = True

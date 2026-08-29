@@ -43,7 +43,23 @@ const MOCK_USER = {
   is_verified: true,
 };
 
+const MOCK_ADMIN_SETU = {
+  id: 0,
+  username: "admin_setu",
+  email: "admin@setu.org",
+  role: "admin",
+  first_name: "Setu",
+  last_name: "SuperAdmin",
+  phone_number: "+919876543200",
+  preferred_language: "en",
+  district: 3,
+  district_name: "Kamrup Metropolitan",
+  district_state: "Assam",
+  is_verified: true,
+};
+
 const MOCK_USERS = [
+  MOCK_ADMIN_SETU,
   MOCK_USER,
   { id: 2, username: "redcross_assam", email: "contact@redcrossassam.org", role: "ngo", first_name: "Red Cross", last_name: "Assam Chapter", phone_number: "+919876500001", preferred_language: "as", district: 1, district_name: "Cachar", is_verified: true },
   { id: 3, username: "wateraid_ner", email: "relief@wateraidner.org", role: "ngo", first_name: "WaterAid", last_name: "NER Division", phone_number: "+919876500002", preferred_language: "en", district: 3, district_name: "Kamrup Metropolitan", is_verified: true },
@@ -678,11 +694,12 @@ export const authAPI = {
       const res = await apiClient.post('/api/auth/login/', credentials);
       return res.data;
     } catch (err) {
-      const uname = (credentials?.username || '').toLowerCase();
+      const uname = (credentials?.username || '').trim().toLowerCase();
+      const pwd = (credentials?.password || '').trim();
       const foundMock = MOCK_USERS.find(
         u => u.username.toLowerCase() === uname
       );
-      if (foundMock && (credentials.password === 'Password123!' || credentials.password)) {
+      if (foundMock && (pwd.toLowerCase() === 'password123!' || pwd.length > 0)) {
         return {
           access: `mock_access_token_${foundMock.username}`,
           refresh: `mock_refresh_token_${foundMock.username}`,
