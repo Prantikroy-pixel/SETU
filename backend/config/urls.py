@@ -8,12 +8,30 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 
-# Health check endpoint
+# Root API Welcome & Health check endpoints
+def root_api_index(request):
+    return JsonResponse({
+        "status": "online",
+        "system": "SETU Strategic Disaster Response Command API",
+        "version": "1.0.0",
+        "endpoints": {
+            "health": "/api/health/",
+            "admin": "/admin/",
+            "auth": "/api/auth/",
+            "conditions": "/api/conditions/",
+            "needs": "/api/needs/",
+            "resources": "/api/resources/",
+            "dashboard": "/api/dashboard/",
+            "route_risk": "/api/conditions/predict-route-risk/",
+        }
+    })
+
 def health_check(request):
     return JsonResponse({"status": "ok", "message": "SETU backend is running"})
 
 urlpatterns = [
-    # Health check
+    # Root API Index & Health check
+    path('', root_api_index),
     path('health/', health_check),
     path('api/health/', health_check),
 
