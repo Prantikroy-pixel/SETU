@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMapEvents } from 'react-leaflet';
-import { conditionAPI } from '../api';
+import { conditionAPI, fetchLiveGeospatialPoint } from '../api';
 import {
   IncidentImpactZoneLayer,
   IncidentSeverityLegend,
