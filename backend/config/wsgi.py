@@ -27,3 +27,11 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 application = get_wsgi_application()
 app = application
+
+# Auto-migrate and seed demo accounts on WSGI server startup if tables don't exist
+try:
+    from django.core.management import call_command
+    call_command('migrate', interactive=False)
+    call_command('seed_demo_data')
+except Exception as e:
+    print(f"[WSGI Startup] Auto-migration/seed note: {e}")

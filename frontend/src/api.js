@@ -1,8 +1,21 @@
 import axios from 'axios';
 import { emitRealtimeEvent } from './utils/notificationSystem';
 
-// When VITE_API_URL is empty, use relative '' so Vercel routes /api/* to Django backend, and Vite dev server proxies /api/* to localhost:8000
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+// Sanitize VITE_API_URL: strip any trailing /api or /api/ so endpoints like /api/auth/login/ don't duplicate to /api/api/auth/login/
+const getSanitizedBaseUrl = () => {
+  let raw = (import.meta.env.VITE_API_URL || '').trim();
+  if (raw.endsWith('/api/')) {
+    raw = raw.slice(0, -5);
+  } else if (raw.endsWith('/api')) {
+    raw = raw.slice(0, -4);
+  }
+  if (raw.endsWith('/')) {
+    raw = raw.slice(0, -1);
+  }
+  return raw;
+};
+
+const API_BASE_URL = getSanitizedBaseUrl();
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
