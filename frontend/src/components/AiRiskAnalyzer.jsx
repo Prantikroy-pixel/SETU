@@ -523,8 +523,7 @@ export default function AiRiskAnalyzer({
                       <span>Urban Flash Flood Alert (Guwahati / Silchar Sector)</span>
                     </div>
                     <div className="text-[11px] font-medium mt-0.5 text-amber-900 leading-relaxed">
-                      Elevated waterlogging risk due to rain sustained over{' '}
-                      <strong>{predictionResult.features?.rainfall_duration_hours || 4.5} consecutive hours</strong> combined with low drainage capacity ({predictionResult.features?.drainage_quality || '1.10'} km/km²) and sparse vegetation cover ({predictionResult.features?.vegetation_cover || '0.25'} NDVI).
+                      Elevated waterlogging risk due to low drainage capacity ({predictionResult.features?.drainage_quality || '1.10'} km/km²) and sparse vegetation cover ({predictionResult.features?.vegetation_cover || '0.25'} NDVI).
                     </div>
                   </div>
                 </div>

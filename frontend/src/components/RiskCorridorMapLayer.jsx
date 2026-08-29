@@ -34,7 +34,7 @@ export const RISK_TIERS = {
     strokeWidth: 5,
     opacity: 0.9,
     dashArray: '8, 6',
-    description: 'Elevated hazard probability. Heavy rainfall or steep slope alert. High risk of delay.',
+    description: 'Elevated hazard probability. Steep slope or terrain alert. High risk of delay.',
   },
   SAFE: {
     key: 'safe',

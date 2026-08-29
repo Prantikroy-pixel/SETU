@@ -70,20 +70,7 @@ const inspectorIcon = new L.DivIcon({
   popupAnchor: [0, -14],
 });
 
-function formatRainActiveTime(durationHours, rainfallMm = 1.0) {
-  if (!rainfallMm || rainfallMm <= 0 || !durationHours || durationHours <= 0) {
-    return 'Clear / No Active Rain';
-  }
-  const now = new Date();
-  const startTime = new Date(now.getTime() - durationHours * 60 * 60 * 1000);
-  let hours = startTime.getHours();
-  const minutes = startTime.getMinutes();
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-  const minStr = minutes < 10 ? '0' + minutes : minutes;
-  return `Since ${hours}:${minStr} ${ampm} (${durationHours.toFixed(1)} hrs continuous)`;
-}
+
 
 export default function MapLocationInspector({
   conditions = [],
@@ -352,11 +339,9 @@ export default function MapLocationInspector({
 
                 {/* 3-Feature Compound Flood Predictor Matrix */}
                 {(() => {
-                  const rainMm = typeof features.rainfall_mm === 'number' ? features.rainfall_mm : 0.0;
-                  const rainDur = typeof features.rainfall_duration_hours === 'number' ? features.rainfall_duration_hours : 0.0;
                   const drainageVal = typeof features.drainage_quality === 'number' ? features.drainage_quality : 2.10;
                   const vegVal = typeof features.vegetation_cover === 'number' ? features.vegetation_cover : 0.58;
-                  const isFloodPredicted = Boolean(features.is_urban_flash_flood) || (isCritical && drainageVal <= 1.5 && (rainMm >= 45.0 || rainDur >= 3.0));
+                  const isFloodPredicted = Boolean(features.is_urban_flash_flood) || (isCritical && drainageVal <= 1.5);
 
                   return (
                     <div className="bg-slate-900 text-white p-3 rounded-xl border border-slate-800 space-y-2.5 shadow-md">

@@ -1419,12 +1419,12 @@ export async function fetchLiveGeospatialPoint(lat, lon, overrides = {}) {
   const threatLevel = isCritical ? 'critical' : isHigh ? 'high' : riskScore >= 0.25 ? 'moderate' : 'low';
 
   const explanationText = urbanFlashFloodCondition
-    ? `URBAN FLASH FLOOD RISK (Guwahati / Silchar / Built Basin): Sustained heavy rainfall over ${activeRainDuration} continuous hours (${rainfall24h}mm total, ${rainIntensity}mm/h intensity). Poor storm drainage (${drainage} km/km²) and sparse vegetation (${vegetation} NDVI) cause severe street waterlogging and road submergence.`
+    ? `URBAN FLASH FLOOD RISK (Guwahati / Silchar / Built Basin): Poor storm drainage (${drainage} km/km²) and sparse vegetation (${vegetation} NDVI) cause severe street waterlogging and road submergence.`
     : isCritical
-    ? `🚨 High disruption probability (${Math.round(riskScore * 100)}%) detected from live satellite telemetry: ${slope}° slope at ${elevation}m elevation with ${rainfall24h}mm precipitation over ${activeRainDuration}h.`
+    ? `🚨 High disruption probability (${Math.round(riskScore * 100)}%) detected from live telemetry: ${slope}° slope at ${elevation}m elevation.`
     : isHigh
-    ? `⚠️ Moderate-to-high environmental risk (${Math.round(riskScore * 100)}%): sustained rain (${rainfall24h}mm) on steep incline (${slope}°).`
-    : `✅ Corridor clear (${Math.round(riskScore * 100)}% risk). Live satellite telemetry confirms nominal pass conditions (${currentRain > 0.05 ? rainfall24h + 'mm active rain' : 'clear weather'}, ${slope}° slope, ${elevation}m elev).`;
+    ? `⚠️ Moderate-to-high environmental risk (${Math.round(riskScore * 100)}%): steep incline (${slope}°) at ${elevation}m elevation.`
+    : `✅ Corridor clear (${Math.round(riskScore * 100)}% risk). Live telemetry confirms nominal pass conditions (${slope}° slope, ${elevation}m elev).`;
 
   return mockResponse({
     latitude: lat,

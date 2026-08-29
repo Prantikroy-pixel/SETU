@@ -283,12 +283,8 @@ def predict_risk(
     driver_factors = []
     if urban_flash_flood_condition:
         driver_factors.append(
-            f"Urban flash flood risk in built basin (sustained rain for {rainfall_duration_hours:.1f}h accumulating {rainfall:.1f}mm at {rainfall_intensity_mm_hr:.1f}mm/h, low drainage {drainage_quality:.2f} km/km², barren vegetation {vegetation_cover:.2f} NDVI)"
+            f"Urban flash flood risk in built basin (low drainage {drainage_quality:.2f} km/km², barren vegetation {vegetation_cover:.2f} NDVI)"
         )
-    elif rainfall >= 65.0:
-        driver_factors.append(f"Torrential precipitation ({rainfall:.1f} mm sustained over {rainfall_duration_hours:.1f}h)")
-    elif rainfall >= 35.0:
-        driver_factors.append(f"Sustained rain ({rainfall:.1f} mm over {rainfall_duration_hours:.1f}h)")
 
     if slope >= 25.0:
         driver_factors.append(f"Steep mountain grade ({slope:.1f}° incline)")
