@@ -65,8 +65,12 @@
       "dest": "backend/config/wsgi.py"
     },
     {
+      "src": "/static/(.*)",
+      "dest": "backend/config/wsgi.py"
+    },
+    {
       "src": "/(.*)",
-      "dest": "frontend/$1"
+      "dest": "frontend/index.html"
     }
   ]
 }

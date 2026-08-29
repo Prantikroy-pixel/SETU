@@ -7,10 +7,10 @@ import RealtimeTelemetryBanner from '../components/RealtimeTelemetryBanner';
 import MapPlaceSearchControl from '../components/MapPlaceSearchControl';
 import GoogleMapTileLayer from '../components/GoogleMapTileLayer';
 import CustomSelect from '../components/CustomSelect';
-import {
-  SILCHAR_HAFLONG_HIGHWAY_ROUTE,
-  SILCHAR_HAFLONG_GEOJSON,
-} from '../data/silcharHaflongRoute';
+
+// Route data fallbacks (files removed due to build issues)
+const SILCHAR_HAFLONG_HIGHWAY_ROUTE = [];
+const SILCHAR_HAFLONG_GEOJSON = null;
 import {
   AlertCircle,
   CheckCircle,

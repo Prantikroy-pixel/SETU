@@ -24,12 +24,50 @@ import argparse
 from datetime import datetime, timezone
 from typing import Tuple, List, Dict, Any, Optional
 
-import numpy as np
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
-from sklearn.metrics import classification_report, roc_auc_score, confusion_matrix, accuracy_score, f1_score
+# Lazy imports - only load when actually used, not during Django startup
+# This prevents memory issues on serverless/free tier platforms
+numpy = None
+GradientBoostingClassifier = None
+RandomForestClassifier = None
+Pipeline = None
+StandardScaler = None
+train_test_split = None
+StratifiedKFold = None
+cross_val_score = None
+classification_report = None
+roc_auc_score = None
+confusion_matrix = None
+accuracy_score = None
+f1_score = None
+
+def _load_ml_dependencies():
+    """Lazy load expensive ML libraries only when needed"""
+    global numpy, GradientBoostingClassifier, RandomForestClassifier
+    global Pipeline, StandardScaler, train_test_split, StratifiedKFold
+    global cross_val_score, classification_report, roc_auc_score
+    global confusion_matrix, accuracy_score, f1_score
+
+    if numpy is None:
+        import numpy as np_module
+        numpy = np_module
+        from sklearn.ensemble import GradientBoostingClassifier as GB, RandomForestClassifier as RF
+        from sklearn.pipeline import Pipeline as P
+        from sklearn.preprocessing import StandardScaler as SS
+        from sklearn.model_selection import train_test_split as tts, StratifiedKFold as SKF, cross_val_score as cvs
+        from sklearn.metrics import classification_report as cr, roc_auc_score as ras, confusion_matrix as cm, accuracy_score as ac, f1_score as f1
+
+        GradientBoostingClassifier = GB
+        RandomForestClassifier = RF
+        Pipeline = P
+        StandardScaler = SS
+        train_test_split = tts
+        StratifiedKFold = SKF
+        cross_val_score = cvs
+        classification_report = cr
+        roc_auc_score = ras
+        confusion_matrix = cm
+        accuracy_score = ac
+        f1_score = f1
 
 # Ingest RealtimeHazardFetcher from realtime_pipeline
 try:
