@@ -1,8 +1,8 @@
 {
-    "name": "setu",
-    "version": "1.0.0",
-    "scripts": {
-      "build": "cd frontend && npm install && npm run build",
-      "start": "cd frontend && npx serve -s dist -l 3000"
-    }
+  "name": "setu",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "echo 'Frontend already built in dist folder'",
+    "start": "npx serve -s frontend/dist -l 3000"
   }
+}
