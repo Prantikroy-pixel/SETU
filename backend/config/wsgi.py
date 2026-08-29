@@ -31,7 +31,11 @@ app = application
 # Auto-migrate and seed demo accounts on WSGI server startup if tables don't exist
 try:
     from django.core.management import call_command
+    from django.contrib.auth import get_user_model
     call_command('migrate', interactive=False)
-    call_command('seed_demo_data')
+
+    User = get_user_model()
+    if not User.objects.filter(username='admin_aryan').exists():
+        call_command('seed_demo_data')
 except Exception as e:
     print(f"[WSGI Startup] Auto-migration/seed note: {e}")
