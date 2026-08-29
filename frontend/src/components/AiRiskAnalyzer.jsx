@@ -35,6 +35,7 @@ import {
   Wind,
   Building2,
   CheckCircle2,
+  Droplets,
 } from 'lucide-react';
 import L from 'leaflet';
 
