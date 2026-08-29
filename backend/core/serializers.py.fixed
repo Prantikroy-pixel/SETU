@@ -1,0 +1,218 @@
+# Fixed serializers with proper GIS field handling
+# This is the corrected version - merge into backend/core/serializers.py
+
+from rest_framework import serializers
+from .models import District, Need, Resource, Condition, MediaAttachment, Allocation, Alert, Institution
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class DistrictSerializer(serializers.ModelSerializer):
+    """Serialize District with proper geometry field handling."""
+    boundary = serializers.SerializerMethodField()
+    centroid = serializers.SerializerMethodField()
+
+    def get_boundary(self, obj):
+        """Safely serialize boundary polygon to GeoJSON."""
+        try:
+            if obj.boundary:
+                # If it's a GIS geometry object
+                if hasattr(obj.boundary, 'geojson'):
+                    import json
+                    return json.loads(obj.boundary.geojson)
+                # If it's already a dict (fallback field)
+                elif isinstance(obj.boundary, dict):
+                    return obj.boundary
+        except Exception as e:
+            logger.warning(f"Boundary serialization error for district {obj.id}: {e}")
+        return None
+
+    def get_centroid(self, obj):
+        """Safely serialize centroid point to GeoJSON."""
+        try:
+            if obj.centroid:
+                if hasattr(obj.centroid, 'x') and hasattr(obj.centroid, 'y'):
+                    return {
+                        "type": "Point",
+                        "coordinates": [obj.centroid.x, obj.centroid.y]
+                    }
+                elif isinstance(obj.centroid, dict):
+                    return obj.centroid
+        except Exception as e:
+            logger.warning(f"Centroid serialization error for district {obj.id}: {e}")
+        return None
+
+    class Meta:
+        model = District
+        fields = ['id', 'name', 'state', 'boundary', 'centroid', 'population']
+
+
+class NeedSerializer(serializers.ModelSerializer):
+    """Serialize Need with proper location field handling."""
+    location = serializers.SerializerMethodField()
+    reported_by_username = serializers.CharField(source='reported_by.username', read_only=True)
+    district_name = serializers.CharField(source='district.name', read_only=True)
+    attachments = serializers.SerializerMethodField()
+
+    def get_location(self, obj):
+        """Safely serialize location point to GeoJSON."""
+        try:
+            if obj.location:
+                if hasattr(obj.location, 'x') and hasattr(obj.location, 'y'):
+                    return {
+                        "type": "Point",
+                        "coordinates": [obj.location.x, obj.location.y],
+                        "latitude": obj.location.y,
+                        "longitude": obj.location.x
+                    }
+                elif isinstance(obj.location, dict):
+                    return obj.location
+        except Exception as e:
+            logger.warning(f"Location serialization error for need {obj.id}: {e}")
+        return None
+
+    def get_attachments(self, obj):
+        """Serialize related attachments."""
+        from .serializers import MediaAttachmentSerializer
+        attachments = obj.attachments.all()
+        return MediaAttachmentSerializer(attachments, many=True).data
+
+    class Meta:
+        model = Need
+        fields = [
+            'id', 'type', 'location', 'district', 'district_name',
+            'urgency', 'quantity', 'unit', 'description',
+            'reported_by', 'reported_by_username', 'status',
+            'created_at', 'updated_at', 'attachments'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'reported_by_username', 'district_name']
+
+
+class ResourceSerializer(serializers.ModelSerializer):
+    """Serialize Resource with proper location field handling."""
+    location = serializers.SerializerMethodField()
+    provider_username = serializers.CharField(source='provider.username', read_only=True)
+    district_name = serializers.CharField(source='district.name', read_only=True)
+
+    def get_location(self, obj):
+        """Safely serialize location point to GeoJSON."""
+        try:
+            if obj.location:
+                if hasattr(obj.location, 'x') and hasattr(obj.location, 'y'):
+                    return {
+                        "type": "Point",
+                        "coordinates": [obj.location.x, obj.location.y],
+                        "latitude": obj.location.y,
+                        "longitude": obj.location.x
+                    }
+                elif isinstance(obj.location, dict):
+                    return obj.location
+        except Exception as e:
+            logger.warning(f"Location serialization error for resource {obj.id}: {e}")
+        return None
+
+    class Meta:
+        model = Resource
+        fields = [
+            'id', 'type', 'location', 'district', 'district_name',
+            'quantity_available', 'unit', 'provider', 'provider_username',
+            'verification_status', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'provider_username', 'district_name']
+
+
+class ConditionSerializer(serializers.ModelSerializer):
+    """Serialize Condition with proper location field handling."""
+    location = serializers.SerializerMethodField()
+    reported_by_username = serializers.CharField(source='reported_by.username', read_only=True, allow_null=True)
+    district_name = serializers.CharField(source='district.name', read_only=True, allow_null=True)
+
+    def get_location(self, obj):
+        """Safely serialize location point to GeoJSON."""
+        try:
+            if obj.location:
+                if hasattr(obj.location, 'x') and hasattr(obj.location, 'y'):
+                    return {
+                        "type": "Point",
+                        "coordinates": [obj.location.x, obj.location.y],
+                        "latitude": obj.location.y,
+                        "longitude": obj.location.x
+                    }
+                elif isinstance(obj.location, dict):
+                    return obj.location
+        except Exception as e:
+            logger.warning(f"Location serialization error for condition {obj.id}: {e}")
+        return None
+
+    class Meta:
+        model = Condition
+        fields = [
+            'id', 'location', 'district', 'district_name',
+            'condition_type', 'value', 'risk_score',
+            'reported_by', 'reported_by_username', 'source', 'reported_at'
+        ]
+        read_only_fields = ['id', 'reported_at', 'reported_by_username', 'district_name']
+
+
+class MediaAttachmentSerializer(serializers.ModelSerializer):
+    """Serialize media attachments."""
+    class Meta:
+        model = MediaAttachment
+        fields = ['id', 'need', 'condition', 'file', 'media_type', 'uploaded_at']
+        read_only_fields = ['id', 'uploaded_at']
+
+
+class AllocationSerializer(serializers.ModelSerializer):
+    """Serialize allocations."""
+    class Meta:
+        model = Allocation
+        fields = [
+            'id', 'match', 'vehicle', 'route_geojson',
+            'estimated_delay_minutes', 'delivery_status', 'assigned_at', 'delivered_at'
+        ]
+        read_only_fields = ['id', 'assigned_at']
+
+
+class AlertSerializer(serializers.ModelSerializer):
+    """Serialize alerts."""
+    class Meta:
+        model = Alert
+        fields = [
+            'id', 'alert_type', 'related_condition', 'related_allocation',
+            'district', 'message', 'severity', 'language', 'channel', 'sent_at'
+        ]
+        read_only_fields = ['id', 'sent_at']
+
+
+class InstitutionSerializer(serializers.ModelSerializer):
+    """Serialize institutions with proper location field handling."""
+    location = serializers.SerializerMethodField()
+    district_name = serializers.CharField(source='district.name', read_only=True, allow_null=True)
+
+    def get_location(self, obj):
+        """Safely serialize location point to GeoJSON."""
+        try:
+            if obj.location:
+                if hasattr(obj.location, 'x') and hasattr(obj.location, 'y'):
+                    return {
+                        "type": "Point",
+                        "coordinates": [obj.location.x, obj.location.y],
+                        "latitude": obj.location.y,
+                        "longitude": obj.location.x
+                    }
+                elif isinstance(obj.location, dict):
+                    return obj.location
+        except Exception as e:
+            logger.warning(f"Location serialization error for institution {obj.id}: {e}")
+        return None
+
+    class Meta:
+        model = Institution
+        fields = [
+            'id', 'name', 'category', 'facility_type', 'district', 'district_name',
+            'state', 'location', 'address', 'contact_number', 'emergency_helpline',
+            'bed_capacity', 'is_auto_ingested', 'source_api',
+            'operational_status', 'metadata', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'district_name']

@@ -1,0 +1,386 @@
+<title>AiRiskAnalyzer Blank Screen - Complete Fix</title>
+
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --success: #10b981;
+  --success-light: #d1fae5;
+  --error: #dc2626;
+  --error-light: #fee2e2;
+  --warning: #f59e0b;
+  --warning-light: #fef3c7;
+  --info: #3b82f6;
+  --info-light: #dbeafe;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --success: #10b981;
+    --success-light: #064e3b;
+    --error: #ef4444;
+    --error-light: #7f1d1d;
+    --warning: #f59e0b;
+    --warning-light: #78350f;
+    --info: #60a5fa;
+    --info-light: #0c2d48;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0 0 30px 0;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 32px 0 16px 0;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--surface);
+  border-left: 4px solid;
+  border-radius: 6px;
+  padding: 16px;
+  margin: 16px 0;
+}
+
+.card.error {
+  border-left-color: var(--error);
+  background: var(--error-light);
+}
+
+.card.success {
+  border-left-color: var(--success);
+  background: var(--success-light);
+}
+
+.card.info {
+  border-left-color: var(--info);
+  background: var(--info-light);
+}
+
+.card.warning {
+  border-left-color: var(--warning);
+  background: var(--warning-light);
+}
+
+.card strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+code {
+  background: var(--bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: "Monaco", "Menlo", monospace;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.code-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: "Monaco", "Menlo", monospace;
+  font-size: 12px;
+  overflow-x: auto;
+  margin: 12px 0;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+ul, ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+li {
+  margin: 6px 0;
+  font-size: 13px;
+}
+
+.command {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  font-family: "Monaco", "Menlo", monospace;
+  font-size: 12px;
+  margin: 12px 0;
+  overflow-x: auto;
+  color: var(--text);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13px;
+}
+
+th, td {
+  padding: 10px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+th {
+  background: var(--bg);
+  font-weight: 600;
+}
+
+.status-icon {
+  font-size: 20px;
+}
+</style>
+
+<div class="container">
+  <h1>🎯 AiRiskAnalyzer Blank Screen - Complete Solution</h1>
+  <p class="subtitle">Based on diagnostic report + defensive numeric pattern implementation</p>
+
+  <div class="card error">
+    <strong>⚠️ Issue Still Present</strong>
+    You're reporting the blank screen is STILL appearing. This means we need to verify the fixes were actually deployed and check for additional issues.
+  </div>
+
+  <h2>Root Cause (From Your Diagnostic Report)</h2>
+  <div class="section">
+    <strong>Primary Error:</strong>
+    <div class="code-block">TypeError: e.toFixed is not a function
+at index-DEXPIZSk.js:437:2671</div>
+
+    <strong>Secondary Issues:</strong>
+    <ul>
+      <li>5 Backend APIs returning HTTP 500 errors</li>
+      <li>Frontend receives null/undefined/string instead of numbers</li>
+      <li>Frontend calls .toFixed() on invalid data types</li>
+      <li>Uncaught error crashes component</li>
+    </ul>
+  </div>
+
+  <h2>Fixes Applied to AiRiskAnalyzer.jsx</h2>
+  <div class="section">
+    <p>We implemented the defensive numeric handling pattern from your diagnostic report:</p>
+
+    <div class="code-block">const value = Number(rawValue);
+const display = Number.isFinite(value)
+  ? value.toFixed(2)
+  : '—';</div>
+
+    <strong>Applied to 7 fields:</strong>
+    <table>
+      <tr>
+        <th>Field</th>
+        <th>Pattern</th>
+        <th>Fallback</th>
+      </tr>
+      <tr>
+        <td>Soil Saturation</td>
+        <td>Number() → isFinite() → percentage</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Slope Gradient</td>
+        <td>Number() → isFinite() → .toFixed(1)</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Drainage Quality</td>
+        <td>Number() → isFinite() → .toFixed(2)</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Temperature</td>
+        <td>Number() → isFinite() → .toFixed(1)</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Humidity</td>
+        <td>Number() → isFinite() → round()</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Wind Speed</td>
+        <td>Number() → isFinite() → .toFixed(1)</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td>Weather Fields</td>
+        <td>All validated before formatting</td>
+        <td>—</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2>Why It's STILL Happening</h2>
+  <div class="section">
+    <div class="card warning">
+      <strong>Possible Reasons:</strong>
+      <ol>
+        <li><strong>Changes not deployed yet</strong> - The AiRiskAnalyzer.jsx fixes haven't been pushed/deployed to Render</li>
+        <li><strong>Cache not cleared</strong> - Browser is serving old cached JavaScript bundle</li>
+        <li><strong>Build failed</strong> - Frontend build errors preventing deployment</li>
+        <li><strong>Different error location</strong> - TypeError might be happening elsewhere, not in the fields we fixed</li>
+        <li><strong>Backend 500 errors still blocking</strong> - API failures preventing component from rendering at all</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Next Steps to Debug & Fix</h2>
+  <div class="section">
+    <h3 style="font-size: 14px; margin: 16px 0 12px 0;">Step 1: Verify Changes Are In Git</h3>
+    <div class="command">cd "/Users/prantikroy/claude code/SETU"
+git status
+git diff frontend/src/components/AiRiskAnalyzer.jsx</div>
+    <p><strong>Should show:</strong> Defensive numeric handling added to 7 fields</p>
+
+    <h3 style="font-size: 14px; margin: 16px 0 12px 0;">Step 2: Push If Not Already Pushed</h3>
+    <div class="command">git add frontend/src/components/AiRiskAnalyzer.jsx
+git commit -m "Fix: Add defensive numeric handling to prevent TypeError crashes"
+git push origin main</div>
+
+    <h3 style="font-size: 14px; margin: 16px 0 12px 0;">Step 3: Hard Refresh & Clear Cache</h3>
+    <p>In browser:</p>
+    <ul>
+      <li>Press <strong>Ctrl+Shift+Delete</strong> (Windows) or <strong>Cmd+Shift+Delete</strong> (Mac)</li>
+      <li>Clear browsing data for "All time"</li>
+      <li>Close and reopen browser</li>
+      <li>Hard refresh: <strong>Ctrl+Shift+R</strong> (Windows) or <strong>Cmd+Shift+R</strong> (Mac)</li>
+    </ul>
+
+    <h3 style="font-size: 14px; margin: 16px 0 12px 0;">Step 4: Open Developer Console & Check Error</h3>
+    <p>Press <strong>F12</strong>, go to Console tab:</p>
+    <ul>
+      <li>Click "Evaluate Highway Corridor Disruption"</li>
+      <li>Look at red error messages</li>
+      <li>Check line number and function name</li>
+      <li><strong>Share the exact error message and line number</strong></li>
+    </ul>
+
+    <h3 style="font-size: 14px; margin: 16px 0 12px 0;">Step 5: Check Network Tab</h3>
+    <p>Press <strong>F12</strong>, go to Network tab:</p>
+    <ul>
+      <li>Click "Evaluate Highway Corridor Disruption"</li>
+      <li>Look for failed requests (red responses)</li>
+      <li>Check which APIs are returning 500 errors</li>
+      <li>See what status codes and responses are sent</li>
+    </ul>
+  </div>
+
+  <h2>If Error STILL Appears After Cache Clear</h2>
+  <div class="section">
+    <div class="card info">
+      <strong>Possible Issue:</strong> Error is happening in a DIFFERENT file or DIFFERENT field than we fixed
+    </div>
+
+    <p><strong>What to do:</strong></p>
+    <ol>
+      <li>Open DevTools (F12) → Console tab</li>
+      <li>Click "Evaluate Highway Corridor Disruption"</li>
+      <li>Look at the error message
+        <ul>
+          <li>What line? (e.g., "at 437:2671")</li>
+          <li>What function? (e.g., "handleRunAnalysis")</li>
+          <li>What exactly is calling .toFixed()? </li>
+        </ul>
+      </li>
+      <li><strong>Screenshot the exact error and share it</strong></li>
+      <li>We can then identify the exact field causing the crash and fix it</li>
+    </ol>
+  </div>
+
+  <h2>What We Need From You</h2>
+  <div class="section">
+    <div class="card success">
+      <strong>To help fix this faster, please provide:</strong>
+      <ol>
+        <li>Screenshot of the browser console error (F12 → Console)</li>
+        <li>The exact line number where error occurs</li>
+        <li>Did you push the changes to git?</li>
+        <li>Did you wait for Render to redeploy (2-3 minutes)?</li>
+        <li>Did you hard refresh the browser (Cmd+Shift+R)?</li>
+        <li>What is the exact error message text?</li>
+      </ol>
+    </div>
+  </div>
+
+  <h2>Files Modified</h2>
+  <div class="section">
+    <ul>
+      <li>✅ frontend/src/components/AiRiskAnalyzer.jsx - 7 numeric fields protected with defensive pattern</li>
+      <li>✅ frontend/src/components/IncidentImpactZoneLayer.jsx - Created</li>
+      <li>✅ frontend/src/components/MapPlaceSearchControl.jsx - Created</li>
+      <li>✅ frontend/src/components/GoogleMapTileLayer.jsx - Created</li>
+      <li>✅ frontend/src/components/CustomSelect.jsx - Created</li>
+    </ul>
+  </div>
+
+  <h2>Summary</h2>
+  <div class="section">
+    <p><strong>What we've done:</strong></p>
+    <ul>
+      <li>✅ Identified root cause: TypeError on .toFixed()</li>
+      <li>✅ Implemented defensive numeric handling on 7 fields</li>
+      <li>✅ Created 4 missing React components</li>
+      <li>✅ Added safe fallbacks for all invalid data</li>
+    </ul>
+
+    <p><strong>Why it might still be appearing:</strong></p>
+    <ul>
+      <li>⚠️ Changes not pushed to git yet</li>
+      <li>⚠️ Changes not deployed to Render yet</li>
+      <li>⚠️ Browser cache not cleared</li>
+      <li>⚠️ Error is in a different field we didn't fix</li>
+      <li>⚠️ Backend 500 errors preventing component render</li>
+    </ul>
+
+    <p><strong>Next action:</strong> Share the console error screenshot so we can identify exactly where the crash is happening and fix that specific location.</p>
+  </div>
+</div>

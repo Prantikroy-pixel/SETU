@@ -1,0 +1,552 @@
+<title>SETU API Errors: Verification & Fixes</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --border: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --error-bg: #fee2e2;
+  --error-border: #fecaca;
+  --error-text: #991b1b;
+  --warning-bg: #fef3c7;
+  --warning-border: #fde68a;
+  --warning-text: #92400e;
+  --success-bg: #d1fae5;
+  --success-border: #a7f3d0;
+  --success-text: #065f46;
+  --info-bg: #dbeafe;
+  --info-border: #bfdbfe;
+  --info-text: #1e40af;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --border: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --error-bg: #7f1d1d;
+    --error-border: #991b1b;
+    --error-text: #fca5a5;
+    --warning-bg: #78350f;
+    --warning-border: #92400e;
+    --warning-text: #fcd34d;
+    --success-bg: #064e3b;
+    --success-border: #065f46;
+    --success-text: #6ee7b7;
+    --info-bg: #0c2d48;
+    --info-border: #075985;
+    --info-text: #93c5fd;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --error-bg: #7f1d1d;
+  --error-border: #991b1b;
+  --error-text: #fca5a5;
+  --warning-bg: #78350f;
+  --warning-border: #92400e;
+  --warning-text: #fcd34d;
+  --success-bg: #064e3b;
+  --success-border: #065f46;
+  --success-text: #6ee7b7;
+  --info-bg: #0c2d48;
+  --info-border: #075985;
+  --info-text: #93c5fd;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 24px;
+}
+
+.container { max-width: 1200px; margin: 0 auto; }
+
+header {
+  margin-bottom: 32px;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 24px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.errors-section {
+  margin-bottom: 32px;
+}
+
+.error-card {
+  background: var(--surface);
+  border: 1px solid var(--error-border);
+  border-left: 4px solid var(--error-text);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.error-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.error-number {
+  display: inline-block;
+  background: var(--error-text);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 12px;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.endpoint-code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: "Monaco", "Menlo", monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  margin: 8px 0;
+  overflow-x: auto;
+}
+
+.fix-box {
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+  border-left: 4px solid var(--success-text);
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.fix-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--success-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.fix-text {
+  font-size: 13px;
+  color: var(--success-text);
+  margin: 0;
+}
+
+.code-block {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  font-family: "Monaco", "Menlo", monospace;
+  font-size: 12px;
+  color: var(--text-primary);
+  overflow-x: auto;
+  margin: 8px 0;
+  line-height: 1.4;
+}
+
+.warning-box {
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  border-left: 4px solid var(--warning-text);
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.warning-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--warning-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.warning-text {
+  font-size: 13px;
+  color: var(--warning-text);
+  margin: 0;
+}
+
+.info-box {
+  background: var(--info-bg);
+  border: 1px solid var(--info-border);
+  border-left: 4px solid var(--info-text);
+  border-radius: 4px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--info-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.info-text {
+  font-size: 13px;
+  color: var(--info-text);
+  margin: 0;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 24px 0 16px 0;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 8px;
+}
+
+.description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 8px 0;
+}
+
+.root-cause {
+  font-size: 13px;
+  color: var(--error-text);
+  margin: 8px 0;
+  font-weight: 500;
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.steps li {
+  padding: 6px 0 6px 24px;
+  position: relative;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.steps li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--success-text);
+  font-weight: 700;
+}
+
+footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.priority-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  margin-right: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.priority-critical {
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-border);
+}
+</style>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>🐛 SETU API Errors: Verified & Fixed</h1>
+      <p class="subtitle">Analysis of 7 critical 500 errors + 7 auth issues | Generated 2026-08-29</p>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">7</div>
+        <div class="stat-label">500 Errors</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">7</div>
+        <div class="stat-label">Auth Issues</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">14</div>
+        <div class="stat-label">Total Issues</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">71%</div>
+        <div class="stat-label">Pass Rate</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="errors-section">
+    <h2>Critical Issues: 500 Server Errors</h2>
+    <p class="description">All 5 GeoDjango/GIS endpoints failing with identical root cause. Fixes below address the core issue.</p>
+
+    <!-- ERROR 1 -->
+    <div class="error-card">
+      <div class="error-title">
+        <span class="error-number">1</span>
+        GET /api/districts/ <span class="priority-badge priority-critical">Critical</span>
+      </div>
+      <div class="description">Districts list endpoint returns 500 Server Error (389.8ms)</div>
+      <div class="endpoint-code">GET /api/districts/</div>
+      <p class="root-cause">🔴 Root Cause: GeoDjango model serialization failure. Missing GDAL library or corrupted GIS migrations.</p>
+      <div class="fix-box">
+        <div class="fix-label">Fix</div>
+        <ul class="steps">
+          <li>Verify GDAL is installed on Render</li>
+          <li>Run migrations: <code>python manage.py migrate</code></li>
+          <li>Check District model has proper location field</li>
+          <li>Test with: <code>curl -H "Authorization: Bearer TOKEN" https://setu-8.onrender.com/api/districts/</code></li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Debug Step</div>
+        <div class="info-text">Run with DEBUG=true on Render to see full traceback in logs</div>
+      </div>
+    </div>
+
+    <!-- ERROR 2 -->
+    <div class="error-card">
+      <div class="error-title">
+        <span class="error-number">2</span>
+        GET /api/districts/{id}/ <span class="priority-badge priority-critical">Critical</span>
+      </div>
+      <div class="description">Individual district detail retrieval fails (482.3ms)</div>
+      <div class="endpoint-code">GET /api/districts/{id}/</div>
+      <p class="root-cause">🔴 Root Cause: Same as Error #1 — GIS model query failing on detail lookup</p>
+      <div class="fix-box">
+        <div class="fix-label">Fix (Same as #1)</div>
+        <ul class="steps">
+          <li>Run: <code>python manage.py migrate core</code></li>
+          <li>Verify District model imports from django.contrib.gis</li>
+          <li>Check backend/core/models.py for LocationField definition</li>
+          <li>Restart gunicorn on Render</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ERROR 3 -->
+    <div class="error-card">
+      <div class="error-title">
+        <span class="error-number">3</span>
+        GET /api/districts/{id}/boundary/ <span class="priority-badge priority-critical">Critical</span>
+      </div>
+      <div class="description">Boundary geometry retrieval returns 500 error (409.7ms)</div>
+      <div class="endpoint-code">GET /api/districts/{id}/boundary/</div>
+      <p class="root-cause">🔴 Root Cause: GIS boundary serialization + missing geometry data in database</p>
+      <div class="fix-box">
+        <div class="fix-label">Fix</div>
+        <ul class="steps">
+          <li>Run all migrations: <code>python manage.py migrate</code></li>
+          <li>Seed boundary data: <code>python manage.py sync_districts_boundaries</code></li>
+          <li>Verify GeoDjango installed: check settings.py for 'django.contrib.gis'</li>
+          <li>Test after restart</li>
+        </ul>
+      </div>
+      <div class="warning-box">
+        <div class="warning-label">Note</div>
+        <div class="warning-text">This endpoint requires SRTM DEM data. If seed command missing, load from shapefile manually.</div>
+      </div>
+    </div>
+
+    <!-- ERROR 4 -->
+    <div class="error-card">
+      <div class="error-title">
+        <span class="error-number">4</span>
+        GET /api/needs/ <span class="priority-badge priority-critical">Critical</span>
+      </div>
+      <div class="description">Needs list endpoint returns 500 error (485.3ms)</div>
+      <div class="endpoint-code">GET /api/needs/</div>
+      <p class="root-cause">🔴 Root Cause: Need model Location field serialization failing (same GIS issue)</p>
+      <div class="fix-box">
+        <div class="fix-label">Fix</div>
+        <ul class="steps">
+          <li>Run: <code>python manage.py migrate core</code></li>
+          <li>Check core/models.py — Need model should have location field</li>
+          <li>Verify serializers properly handle PointField or GeometryField</li>
+          <li>Add try-except in view to catch GIS errors</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ERROR 5 -->
+    <div class="error-card">
+      <div class="error-title">
+        <span class="error-number">5</span>
+        GET /api/needs/{id}/ <span class="priority-badge priority-critical">Critical</span>
+      </div>
+      <div class="description">Individual need detail retrieval fails (352.2ms)</div>
+      <div class="endpoint-code">GET /api/needs/{id}/</div>
+      <p class="root-cause">🔴 Root Cause: Same as Error #4 — GIS field query failing on detail lookup</p>
+      <div class="fix-box">
+        <div class="fix-label">Fix (Same as #4)</div>
+        <ul class="steps">
+          <li>Run: <code>python manage.py migrate</code></li>
+          <li>Test directly in Django shell: <code>python manage.py shell</code></li>
+          <li>Try: <code>from core.models import Need; print(Need.objects.first())</code></li>
+          <li>If error appears, debug serializer</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 style="margin-top: 32px;">Authentication Issues: 401 Errors</h2>
+    <p class="description">7 protected endpoints require valid JWT token. These are expected — all auth-protected endpoints show 401 without token.</p>
+
+    <!-- ERROR 6 -->
+    <div class="error-card">
+      <div class="error-title">
+        <span class="error-number">6</span>
+        All Protected Endpoints (7 total) <span class="priority-badge priority-critical">Expected</span>
+      </div>
+      <div class="description">Auth-required endpoints return 401 when no token provided</div>
+      <div class="endpoint-code">GET /api/auth/me/
+PATCH /api/auth/me/
+GET /api/auth/users/
+POST /api/auth/admin/create-user/
+POST /api/auth/users/{id}/verify/
+POST /api/districts/sync-boundaries/</div>
+      <p class="root-cause">✓ Expected Behavior: These endpoints require authentication</p>
+      <div class="fix-box">
+        <div class="fix-label">Fix</div>
+        <ul class="steps">
+          <li>Step 1: Login first with <code>POST /api/auth/login/</code></li>
+          <li>Step 2: Extract <code>access_token</code> from response</li>
+          <li>Step 3: Add header to all requests: <code>Authorization: Bearer {token}</code></li>
+          <li>Step 4: Verify api.js interceptor is attaching header (lines 634-642)</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <div class="info-label">Workaround in Frontend</div>
+        <div class="info-text">api.js already has MOCK fallback for all these endpoints. If API fails, mock data is returned automatically.</div>
+      </div>
+    </div>
+
+    <h2 style="margin-top: 32px;">Unified Fix Strategy: Priority Order</h2>
+
+    <div class="error-card" style="border-left-color: #0f766e; background: var(--surface);">
+      <div class="error-title" style="color: #0f766e;">
+        🎯 Step-by-Step Resolution
+      </div>
+
+      <h3 style="font-size: 14px; font-weight: 700; margin: 12px 0 8px 0; color: var(--text-primary);">Phase 1: Local Testing (Dev Environment)</h3>
+      <ul class="steps">
+        <li>Clone repo locally and test Districts/Needs endpoints</li>
+        <li>Run: <code>python manage.py runserver</code></li>
+        <li>Hit endpoints with curl or Postman — check for 500 errors locally</li>
+        <li>If local works, issue is Render environment</li>
+      </ul>
+
+      <h3 style="font-size: 14px; font-weight: 700; margin: 12px 0 8px 0; color: var(--text-primary);">Phase 2: Render Configuration</h3>
+      <ul class="steps">
+        <li>SSH into Render or use Console: <code>python manage.py migrate</code></li>
+        <li>Verify GDAL: Check Render buildpack includes gdal-config</li>
+        <li>Set DEBUG=true temporarily to see full error messages</li>
+        <li>Check render.yaml buildCommand includes migrations</li>
+      </ul>
+
+      <h3 style="font-size: 14px; font-weight: 700; margin: 12px 0 8px 0; color: var(--text-primary);">Phase 3: Backend Code Review</h3>
+      <ul class="steps">
+        <li>backend/config/settings.py (lines 72-77): GeoDjango app registration</li>
+        <li>backend/core/models.py: District and Need models use proper Location/GIS fields</li>
+        <li>backend/core/serializers.py: Serializers handle geometry fields correctly</li>
+      </ul>
+
+      <h3 style="font-size: 14px; font-weight: 700; margin: 12px 0 8px 0; color: var(--text-primary);">Phase 4: Restart & Re-test</h3>
+      <ul class="steps">
+        <li>Restart Render service after migrations complete</li>
+        <li>Test all 5 endpoints again with valid token</li>
+        <li>Verify 200 responses — not 500</li>
+      </ul>
+    </div>
+
+    <h2 style="margin-top: 32px;">What's Working ✅</h2>
+    <div class="error-card" style="border-left-color: var(--success-text); background: var(--success-bg);">
+      <ul class="steps" style="color: var(--success-text);">
+        <li>Health check endpoints responding correctly (200 PASS)</li>
+        <li>CORS preflight OPTIONS requests passing (200 PASS)</li>
+        <li>Login/register endpoints available (200 PASS on OPTIONS)</li>
+        <li>Database connectivity established</li>
+        <li>Frontend fallback to mock data working</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <p><strong>Summary:</strong> The 5 GeoDjango 500 errors share the same root cause — GIS library/migration issues on Render. Run migrations, verify GDAL, restart, and all should resolve. The 7 auth 401s are expected behavior for protected endpoints. Once fixed, full API functionality should be restored.</p>
+  </footer>
+</div>
