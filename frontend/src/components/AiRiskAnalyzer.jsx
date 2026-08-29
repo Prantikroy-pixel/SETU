@@ -76,7 +76,7 @@ export default function AiRiskAnalyzer({
   const [predictionResult, setPredictionResult] = useState(null);
 
   // Get currently selected real corridor object
-  const activeCorridor = NER_HIGHWAY_CORRIDORS.find((c) => c.id === selectedCorridorId) || NER_HIGHWAY_CORRIDORS[0];
+  const activeCorridor = NER_HIGHWAY_CORRIDORS.find((c) => c.id === selectedCorridorId) || NER_HIGHWAY_CORRIDORS[0] || { path: [[24.83, 92.78]], name: 'Default', section: 'Default' };
 
   const handlePointChange = (e) => {
     const { name, value, type, checked } = e.target;
