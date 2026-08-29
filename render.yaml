@@ -29,9 +29,9 @@ services:
   - type: web
     name: setu-frontend
     env: node
-    rootDir: frontend
-    buildCommand: "npm install && npm run build"
-    startCommand: "npx serve -s dist -l $PORT"
+    rootDir: ""
+    buildCommand: "cd frontend && npm install && npm run build"
+    startCommand: "cd frontend && npx serve -s dist -l $PORT"
     envVars:
       - key: NODE_ENV
         value: production
